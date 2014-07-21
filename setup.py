@@ -1,11 +1,9 @@
-import os
-import sys
-
 from setuptools import setup
+from tree_extractor import VERSION
 
 setup(
     name='tree_extractor',
-    version='0.1',
+    version=VERSION,
     description="Lib to extract html elements by preserving ancestors and cleaning CSS",
     author='Florian PAQUET',
     author_email='contact@florianpaquet.com',

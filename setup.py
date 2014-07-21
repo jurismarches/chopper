@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-VERSION = '0.1.2'
+VERSION = '0.1.3'
 
+with open('README.rst', 'r') as f:
+    long_description = f.read()
 
 setup(
     name='tree_extractor',
     version=VERSION,
     description="Lib to extract html elements by preserving ancestors and cleaning CSS",
+    long_description=long_description,
     author=u'Jurismarchés',
     author_email='contact@jurismarches.com',
     url='https://github.com/jurismarches/tree_extractor',

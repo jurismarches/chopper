@@ -41,7 +41,7 @@ Usage
   
 The result is :
 
-.. code-block::
+.. code-block:: python
 
   >>> html
   """

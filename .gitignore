@@ -1,10 +1,13 @@
 *
 !.gitignore
+!.travis.yml
+!Makefile
 !LICENSE
 !AUTHORS
 !tree_extractor/
 !tree_extractor/*
 !requirements.txt
+!requirements-dev.txt
 !setup.py
 __pycache__/
 *.py[cod]

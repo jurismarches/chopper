@@ -1,0 +1,8 @@
+*
+!.gitignore
+!tree_extractor/
+!tree_extractor/*
+!requirements.txt
+!setup.py
+__pycache__/
+*.py[cod]

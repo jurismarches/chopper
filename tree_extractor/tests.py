@@ -153,3 +153,33 @@ class TreeExtractorTestCase(TestCase):
         expected_html = """<html><body><div id="main"><a href="test">Test <em>Link</em></a></div></body></html>"""
 
         self.assertEqual(self.format_output(html), expected_html)
+
+    def test_rel_to_abs(self):
+        """
+        Tests an extractor with a global element discard but with a specific keep
+        """
+        input_css = """a { background: url('picture.jpg');}"""
+
+        extractor = TreeExtractor().keep('//div[@id="main"]/a').discard('//a')
+        html, css = extractor.extract(
+            TEST_HTML, input_css, base_url='http://test.com', rel_to_abs=True)
+
+        expected_html = """<html><body><div id="main"><a href="http://test.com/test">Test <em>Link</em></a></div></body></html>"""
+        expected_css = """a{background:url('http://test.com/picture.jpg');}"""
+
+        self.assertEqual(self.format_output(html), expected_html)
+        self.assertEqual(self.format_output(css), expected_css)
+
+        # More tests with different CSS formatting
+
+        input_css = """a { background: url("picture.jpg");}"""
+        html, css = extractor.extract(
+            TEST_HTML, input_css, base_url='http://test.com', rel_to_abs=True)
+
+        self.assertEqual(self.format_output(css), expected_css)
+
+        input_css = """a { background: url(picture.jpg);}"""
+        html, css = extractor.extract(
+            TEST_HTML, input_css, base_url='http://test.com', rel_to_abs=True)
+
+        self.assertEqual(self.format_output(css), expected_css)

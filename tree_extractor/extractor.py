@@ -1,7 +1,10 @@
 # -*- coding:utf-8 -*-
+import re
 import tinycss
 import cssselect
+from six.moves.urllib.parse import urljoin
 from lxml import html
+from lxml.etree import strip_attributes
 from itertools import chain
 
 from .translator import XpathTranslator
@@ -12,8 +15,18 @@ class TreeExtractor(object):
     Extracts HTML contents given a list of xpaths
     by preserving ancestors
     """
+    # HTML specifics
+    rel_to_abs_html_excluded_prefixes = ('#', 'javascript:', 'mailto:')
+    javascript_open_re = re.compile(
+        r'(?P<opening>open\([\"\'])(?P<url>.*)(?P<ending>[\"\']\))',
+        re.IGNORECASE | re.MULTILINE | re.DOTALL)
+
+    # CSS specifics
     css_parser = tinycss.CSSPage3Parser()
     xpath_translator = XpathTranslator()
+    rel_to_abs_css_re = re.compile(
+        r'url\(["\']?(?P<path>.*)["\']?\)',
+        re.IGNORECASE | re.MULTILINE | re.DOTALL)
 
     def __init__(self):
 
@@ -41,17 +54,35 @@ class TreeExtractor(object):
         self.xpaths_to_discard.append(xpath)
         return self
 
-    def extract(self, html_contents, css_contents=None):
+    def extract(self, html_contents, css_contents=None, base_url=None, rel_to_abs=False):
         """
         Extracts the cleaned html tree as a string and only
         css rules matching the cleaned html tree
         """
         # Clean HTML
-        cleaned_html = self._extract_html(html_contents)
+        cleaned_tree = self._extract_html(html_contents)
+
+        if cleaned_tree is not None:
+
+            # Relative to absolute URLs
+            if rel_to_abs and base_url is not None:
+                cleaned_tree = self._rel_to_abs_html(cleaned_tree, base_url)
+
+            # Convert ElementTree to string
+            cleaned_html = html.tostring(cleaned_tree).decode()
+
+        else:
+            cleaned_html = None
 
         # Clean CSS
         if css_contents is not None:
+
             cleaned_css = self._extract_css(css_contents)
+
+            # Relative to absolute URLs
+            if rel_to_abs and base_url is not None:
+                cleaned_css = self._rel_to_abs_css(base_url, cleaned_css)
+
         else:
             return cleaned_html
 
@@ -86,7 +117,7 @@ class TreeExtractor(object):
         self._parse_element(self.tree, is_keep=is_root)
         self._remove_elements()
 
-        return html.tostring(self.tree).decode()
+        return self.tree
 
     def _get_elements_to_keep(self):
         """
@@ -168,6 +199,31 @@ class TreeExtractor(object):
             # Remove the element
             e.getparent().remove(e)
 
+    def _rel_to_abs_html(self, tree, base_url):
+        """
+        Converts relative links from html contents to absolute links
+        """
+        # Delete target attributes
+        strip_attributes(tree, 'target')
+
+        # Absolute links
+        tree.rewrite_links(
+            lambda link: urljoin(base_url, link)
+            if not link.startswith(self.rel_to_abs_html_excluded_prefixes) else link)
+
+        # Extra attributes
+        onclick_elements = tree.xpath('//*[@onclick]')
+
+        for element in onclick_elements:
+            # Replace attribute with absolute URL
+            element.set('onclick', self.javascript_open_re.sub(
+                lambda match: '%s%s%s' % (match.group('opening'),
+                        urljoin(base_url, match.group('url')),
+                        match.group('ending')),
+                element.get('onclick')))
+
+        return tree
+
     ###############
     # CSS Parsing #
     ###############
@@ -223,3 +279,11 @@ class TreeExtractor(object):
                 ''.join('%s:%s;' % (d.name, d.value.as_css()) for d in rule.declarations))
 
         return css_contents
+
+    def _rel_to_abs_css(self, base_url, css_contents):
+        """
+        Converts relative links from css contents to absolute links
+        """
+        return self.rel_to_abs_css_re.sub(
+            lambda match: "url('%s')" % urljoin(base_url, match.group('path').strip('\'"')),
+            css_contents)

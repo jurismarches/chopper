@@ -274,9 +274,10 @@ class TreeExtractor(object):
 
         # Build the cleaned CSS contents
         for rule in rules:
-            css_contents += '%s{%s}\n' % (
-                rule.selector.as_css(),
-                ''.join('%s:%s;' % (d.name, d.value.as_css()) for d in rule.declarations))
+            if rule.at_keyword is None:
+                css_contents += '%s{%s}\n' % (
+                    rule.selector.as_css(),
+                    ''.join('%s:%s;' % (d.name, d.value.as_css()) for d in rule.declarations))
 
         return css_contents
 

@@ -156,7 +156,7 @@ class TreeExtractorTestCase(TestCase):
 
     def test_rel_to_abs(self):
         """
-        Tests an extractor with a global element discard but with a specific keep
+        Tests the rel_to_abs feature
         """
         input_css = """a { background: url('picture.jpg');}"""
 
@@ -183,3 +183,19 @@ class TreeExtractorTestCase(TestCase):
             TEST_HTML, input_css, base_url='http://test.com', rel_to_abs=True)
 
         self.assertEqual(self.format_output(css), expected_css)
+
+    def test_css_at_rule(self):
+        """
+        Tests CSS contents with @ rules
+        """
+        input_css = """
+        @import 'test.css';
+        @media screen {p{color: blue;}}
+        a { color: blue; }
+        """
+        extractor = TreeExtractor().keep('//div[@id="main"]/a').discard('//a')
+        _, css = extractor.extract(TEST_HTML, input_css)
+
+        expected_css = """a{color:blue;}"""
+        self.assertEqual(self.format_output(css), expected_css)
+

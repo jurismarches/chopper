@@ -47,12 +47,7 @@ class TreeExtractor(object):
         css rules matching the cleaned html tree
         """
         # Clean HTML
-        cleaned_tree = self._extract_html(html_contents)
-
-        if cleaned_tree is not None:
-            cleaned_html = html.tostring(cleaned_tree).decode()
-        else:
-            cleaned_html = None
+        cleaned_html = self._extract_html(html_contents)
 
         # Clean CSS
         if css_contents is not None:
@@ -91,7 +86,7 @@ class TreeExtractor(object):
         self._parse_element(self.tree, is_keep=is_root)
         self._remove_elements()
 
-        return self.tree
+        return html.tostring(self.tree).decode()
 
     def _get_elements_to_keep(self):
         """
@@ -195,7 +190,6 @@ class TreeExtractor(object):
         # Init the cleaned CSS rules and contents string
         css_rules = []
 
-
         # For every rule in the CSS
         for rule in stylesheet.rules:
             try:
@@ -213,8 +207,8 @@ class TreeExtractor(object):
         """
         Returns whether the rule matches the HTML tree
         """
-        return any(self.tree.xpath(self.xpath_translator.selector_to_xpath(selector))\
-            for selector in cssselect.parse(rule.selector.as_css()))
+        return any(self.tree.xpath(self.xpath_translator.selector_to_xpath(selector))
+                   for selector in cssselect.parse(rule.selector.as_css()))
 
     def _build_css(self, rules):
         """

@@ -1,4 +1,4 @@
-import re
+# -*- coding: utf-8 -*-
 from unittest import TestCase
 
 from .extractor import TreeExtractor
@@ -45,6 +45,12 @@ span { color: red; }
 
 
 class TreeExtractorTestCase(TestCase):
+
+    def __init__(self, *args, **kwargs):
+        super(TreeExtractorTestCase, self).__init__(*args, **kwargs)
+
+        if not hasattr(self, 'assertIsNone'):
+            self.assertIsNone = lambda v: self.assertEqual(v, None)
 
     def format_output(self, output):
         return ''.join(l.strip() for l in output.splitlines())

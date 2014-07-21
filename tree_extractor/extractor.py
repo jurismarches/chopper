@@ -92,13 +92,13 @@ class TreeExtractor(object):
         """
         Returns a list of lxml Elements to keep
         """
-        return list(*chain(self.tree.xpath(x) for x in self.xpaths_to_keep))
+        return list(chain(*[self.tree.xpath(x) for x in self.xpaths_to_keep]))
 
     def _get_elements_to_discard(self):
         """
         Returns a list of lxml Elements to discard
         """
-        return list(*chain(self.tree.xpath(x) for x in self.xpaths_to_discard))
+        return list(chain(*[self.tree.xpath(x) for x in self.xpaths_to_discard]))
 
     def _parse_element(self, elt, is_keep=False):
         """

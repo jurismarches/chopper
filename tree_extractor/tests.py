@@ -131,3 +131,14 @@ class TreeExtractorTestCase(TestCase):
 
         self.assertEqual(self.format_output(html), expected_html)
         self.assertEqual(self.format_output(css), expected_css)
+
+    def test_multiple_keep(self):
+        """
+        Tests an extractor with multiple keep rules
+        """
+        extractor = TreeExtractor().keep('//footer').keep('//div[@id="main"]')
+        html = extractor.extract(TEST_HTML)
+
+        expected_html = """<html><body><div id="main"><a href="test">Test <em>Link</em></a></div><footer>I am the <span>footer</span></footer></body></html>"""
+
+        self.assertEqual(self.format_output(html), expected_html)

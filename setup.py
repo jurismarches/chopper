@@ -1,5 +1,7 @@
 from setuptools import setup
-from tree_extractor import VERSION
+
+VERSION = '0.1.1'
+
 
 setup(
     name='tree_extractor',

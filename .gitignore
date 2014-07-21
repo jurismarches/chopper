@@ -1,5 +1,7 @@
 *
 !.gitignore
+!LICENSE
+!AUTHORS
 !tree_extractor/
 !tree_extractor/*
 !requirements.txt

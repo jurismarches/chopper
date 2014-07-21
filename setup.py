@@ -7,8 +7,9 @@ setup(
     name='tree_extractor',
     version=VERSION,
     description="Lib to extract html elements by preserving ancestors and cleaning CSS",
-    author='Florian PAQUET',
-    author_email='contact@florianpaquet.com',
+    author=u'Jurismarchés',
+    author_email='contact@jurismarches.com',
+    url='https://github.com/jurismarches/tree_extractor',
     packages=[
         'tree_extractor'
     ],

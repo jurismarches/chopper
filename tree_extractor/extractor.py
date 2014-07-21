@@ -81,7 +81,7 @@ class TreeExtractor(object):
         self.elts_to_remove = []
 
         # Check if the root is a match or if there is any matches
-        is_root = self.tree in self.elts_to_keep
+        is_root = self._is_keep(self.tree)
         has_descendant = self._has_keep_elt_in_descendants(self.tree)
 
         if not(is_root or has_descendant):
@@ -112,14 +112,14 @@ class TreeExtractor(object):
         for e in elt.iterchildren():
 
             # Element is an explicit one to discard, flag it and continue
-            if e in self.elts_to_discard:
+            if self._is_discard(e):
                 self.elts_to_remove.append(e)
                 continue
 
             if not is_keep:
                 # Parent element is not an explicit keep, normal process
                 # Element is an explicit one to keep, inspect it
-                if e in self.elts_to_keep:
+                if self._is_keep(e):
                     self._parse_element(e, is_keep=True)
                     continue
 
@@ -134,6 +134,18 @@ class TreeExtractor(object):
             else:
                 # Element is a child of a keep element, only check explicit discards
                 self._parse_element(e, is_keep=True)
+
+    def _is_keep(self, elt):
+        """
+        Returns whether an Element is an explicit one to keep or not
+        """
+        return elt in self.elts_to_keep
+
+    def _is_discard(self, elt):
+        """
+        Returns whether an Element is an explicit one to discard or not
+        """
+        return elt in self.elts_to_discard
 
     def _has_keep_elt_in_descendants(self, elt):
         """

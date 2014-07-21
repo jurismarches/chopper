@@ -107,7 +107,7 @@ class TreeExtractor(object):
         for e in elt.iterchildren():
 
             # Element is an explicit one to discard, flag it and continue
-            if self._is_discard(e):
+            if self._is_discard(e) and not self._is_keep(e):
                 self.elts_to_remove.append(e)
                 continue
 

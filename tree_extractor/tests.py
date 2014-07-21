@@ -142,3 +142,14 @@ class TreeExtractorTestCase(TestCase):
         expected_html = """<html><body><div id="main"><a href="test">Test <em>Link</em></a></div><footer>I am the <span>footer</span></footer></body></html>"""
 
         self.assertEqual(self.format_output(html), expected_html)
+
+    def test_global_discard_with_specific_keep(self):
+        """
+        Tests an extractor with a global element discard but with a specific keep
+        """
+        extractor = TreeExtractor().keep('//div[@id="main"]/a').discard('//a')
+        html = extractor.extract(TEST_HTML)
+
+        expected_html = """<html><body><div id="main"><a href="test">Test <em>Link</em></a></div></body></html>"""
+
+        self.assertEqual(self.format_output(html), expected_html)

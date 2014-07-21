@@ -1,6 +1,9 @@
 tree_extractor
 ==============
 
+.. image:: https://travis-ci.org/jurismarches/tree_extractor.svg?branch=master
+    :target: https://travis-ci.org/jurismarches/tree_extractor
+
 Extracts html contents by preserving ancestors and clean CSS
 
 Usage

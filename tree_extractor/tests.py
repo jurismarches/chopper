@@ -184,18 +184,33 @@ class TreeExtractorTestCase(TestCase):
 
         self.assertEqual(self.format_output(css), expected_css)
 
-    def test_css_at_rule(self):
-        """
-        Tests CSS contents with @ rules
-        """
+    def test_css_at_rules(self):
         input_css = """
         @import 'test.css';
         @media screen {p{color: blue;}}
-        a { color: blue; }
+        @font-face {font-family: 'test';
+          font-style: normal;
+          font-weight: 300;
+          src: local('test');
+        }
+        @page {
+            margin: 1in;
+            size: portrait;
+            marks: none;
+        }
+        @page h1  :first {
+            font-size: 20pt;
+        }
+        @page :left {
+          margin-left: 4cm;
+        }
+        a {
+            color: blue;
+        }
         """
         extractor = TreeExtractor().keep('//div[@id="main"]/a').discard('//a')
-        _, css = extractor.extract(TEST_HTML, input_css)
+        _, css = extractor.extract(
+            TEST_HTML, input_css, base_url='http://test.com/dir/', rel_to_abs=True)
 
-        expected_css = """a{color:blue;}"""
+        expected_css = """@import url('http://test.com/dir/test.css') all;@media screen{p{color:blue;}}@font-face{font-family:'test';font-style:normal;font-weight:300;src:local('test');}@page{margin:1in;size:portrait;marks:none;}@page h1 :first{font-size:20pt;}@page :left{margin-left:4cm;}a{color:blue;}"""
         self.assertEqual(self.format_output(css), expected_css)
-

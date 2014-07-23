@@ -1,12 +1,14 @@
 # -*- coding:utf-8 -*-
 import re
-import tinycss
 import cssselect
 from six.moves.urllib.parse import urljoin
+from tinycss.css21 import RuleSet, ImportRule, MediaRule, PageRule
 from lxml import html
 from lxml.etree import strip_attributes
 from itertools import chain
 
+from .parser import CSSParser
+from .rules import FontFaceRule
 from .translator import XpathTranslator
 
 
@@ -22,7 +24,7 @@ class TreeExtractor(object):
         re.IGNORECASE | re.MULTILINE | re.DOTALL)
 
     # CSS specifics
-    css_parser = tinycss.CSSPage3Parser()
+    css_parser = CSSParser()
     xpath_translator = XpathTranslator()
     rel_to_abs_css_re = re.compile(
         r'url\(["\']?(?P<path>.*)["\']?\)',
@@ -263,6 +265,10 @@ class TreeExtractor(object):
         """
         Returns whether the rule matches the HTML tree
         """
+        # Always return True for @ rules
+        if rule.at_keyword:
+            return True
+
         return any(self.tree.xpath(self.xpath_translator.selector_to_xpath(selector))
                    for selector in cssselect.parse(rule.selector.as_css()))
 
@@ -270,16 +276,50 @@ class TreeExtractor(object):
         """
         Returns a CSS string for the given rules
         """
-        css_contents = ''
+        # Build and return the cleaned CSS contents
+        return '\n'.join(self._rule_as_string(rule) for rule in rules)
 
-        # Build the cleaned CSS contents
-        for rule in rules:
-            if rule.at_keyword is None:
-                css_contents += '%s{%s}\n' % (
-                    rule.selector.as_css(),
-                    ''.join('%s:%s;' % (d.name, d.value.as_css()) for d in rule.declarations))
+    def _rule_as_string(self, rule):
+        """
+        Converts a tinycss rule to a formatted CSS string
+        """
+        if isinstance(rule, RuleSet):
+            # Simple CSS rule : a { color: red; }
+            return '%s{%s}' % (
+                rule.selector.as_css(),
+                self._declarations_as_string(rule.declarations))
 
-        return css_contents
+        elif isinstance(rule, ImportRule):
+            # @import rule
+            return "@import url('%s') %s;" % (
+                rule.uri, ','.join(rule.media))
+
+        elif isinstance(rule, FontFaceRule):
+            # @font-face rule
+            return "@font-face{%s}" % self._declarations_as_string(rule.declarations)
+
+        elif isinstance(rule, MediaRule):
+            # @media rule
+            return "@media %s{%s}" % (
+                ','.join(rule.media),
+                ''.join(self._rule_as_string(r) for r in rule.rules))
+
+        elif isinstance(rule, PageRule):
+            # @page rule
+            selector, pseudo = rule.selector
+
+            return "@page%s%s{%s}" % (
+                ' %s' % selector if selector else '',
+                ' :%s' % pseudo if pseudo else '',
+                self._declarations_as_string(rule.declarations))
+
+        return ''
+
+    def _declarations_as_string(self, declarations):
+        """
+        Returns a list of declarations as a formatted CSS string
+        """
+        return ''.join('%s:%s;' % (d.name, d.value.as_css()) for d in declarations)
 
     def _rel_to_abs_css(self, base_url, css_contents):
         """

@@ -8,6 +8,11 @@ Extracts html contents by preserving ancestors and clean CSS
 
 Compatible with Python >= 2.6, <= 3.4
 
+Installation
+------------
+
+``pip install tree-extractor``
+
 Usage
 -----
 

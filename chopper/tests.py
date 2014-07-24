@@ -230,7 +230,20 @@ class ExtractorTestCase(TestCase):
         extractor = Extractor().keep('//body')
         _, css = extractor.extract(TEST_HTML, input_css)
 
-        expected_css = """body,a,div .test #id,article{color:blue;}"""
+        expected_css = """body,a{color:blue;}"""
         self.assertEqual(css, expected_css)
 
+    def test_css_multiple_selectors_clean(self):
+        """
+        Tests CSS with multiple selectors cleaning
+        """
+        input_css = """
+        a, div, footer, body, span { color: red; font-size: 10px; }
+        a, span, header { border: 1px solid red; }
+        """
 
+        extractor = Extractor().keep('//div[@id="main"]/a')
+        html, css = extractor.extract(TEST_HTML, input_css)
+
+        expected_css = """a,div,body{color:red;font-size:10px;}a{border:1px solid red;}"""
+        self.assertEqual(self.format_output(css), expected_css)

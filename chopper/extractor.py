@@ -351,32 +351,81 @@ class Extractor(object):
 
         # For every rule in the CSS
         for rule in stylesheet.rules:
+
             try:
-                # Check if any of the rule declaration matches the tree
-                if self._rule_matches_tree(rule):
-                    # Append it to the css rules matches list
-                    css_rules.append(rule)
+                # Clean the CSS rule
+                cleaned_rule = self._clean_rule(rule)
+
+                # Append the rule to matched CSS rules
+                if cleaned_rule is not None:
+                    css_rules.append(cleaned_rule)
+
             except:
+                raise
                 # On error, assume the rule matched the tree
                 css_rules.append(rule)
 
         return self._build_css(css_rules)
 
-    def _rule_matches_tree(self, rule):
+    def _clean_rule(self, rule):
         """
-        Returns whether the rule matches the HTML tree
+        Cleans a css Rule by removing Selectors without matches on the tree
+        Returns None if the whole rule do not match
 
         :param rule: CSS Rule to check
         :type rule: A tinycss Rule object
-        :returns: True if the rule has matches in self.tree
+        :returns: A cleaned tinycss Rule with only Selectors matching the tree or None
+        :rtype: tinycss Rule or None
+        """
+        # Always match @ rules
+        if rule.at_keyword is not None:
+            return rule
+
+        # Clean selectors
+        cleaned_token_list = []
+
+        for i, token_list in enumerate(split_on_comma(rule.selector)):
+
+            # If the token list matches the tree
+            if self._token_list_matches_tree(token_list):
+
+                # Add a Comma if multiple token lists matched
+                if i > 0:
+                    cleaned_token_list.append(
+                        cssselect.parser.Token('DELIM', ',', i + 1))
+
+                # Append it to the list of cleaned token list
+                cleaned_token_list += token_list
+
+        # Return None if selectors list is empty
+        if not cleaned_token_list:
+            return None
+
+        # Update rule token list
+        rule.selector = cleaned_token_list
+
+        # Return cleaned rule
+        return rule
+
+    def _token_list_matches_tree(self, token_list):
+        """
+        Returns whether the token list matches the HTML tree
+
+        :param selector: A Token list to check
+        :type selector: list of Token objects
+        :returns: True if the token list has matches in self.tree
         :rtype: bool
         """
-        # Always return True for @ rules
-        if rule.at_keyword:
-            return True
+        try:
+            parsed_selector = cssselect.parse(
+                ''.join(token.as_css() for token in token_list))[0]
 
-        return any(self.tree.xpath(self.xpath_translator.selector_to_xpath(selector))
-                   for selector in cssselect.parse(rule.selector.as_css()))
+            return bool(
+                self.tree.xpath(self.xpath_translator.selector_to_xpath(parsed_selector)))
+        except:
+            raise
+            # On error, assume the selector matches the tree
+            return True
 
     def _build_css(self, rules):
         """

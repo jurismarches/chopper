@@ -216,3 +216,21 @@ class ExtractorTestCase(TestCase):
 
         expected_css = """@import url('http://test.com/dir/test.css') all;@import url('http://website.com/css/style.css') all;@media screen{p{color:blue;}}@font-face{font-family:'test';font-style:normal;font-weight:300;src:local('test');}@page{margin:1in;size:portrait;marks:none;}@page h1 :first{font-size:20pt;}@page :left{margin-left:4cm;}a{color:blue;background-image:url(data:image/png;base64,BASE64DATA);}"""
         self.assertEqual(self.format_output(css), expected_css)
+
+    def test_css_selector_formatting(self):
+        """
+        Tests CSS selectors with newlines, multiple spaces, etc
+        """
+        input_css = """body,
+        a,     div .test #id,
+
+        article
+        { color: blue; }"""
+
+        extractor = Extractor().keep('//body')
+        _, css = extractor.extract(TEST_HTML, input_css)
+
+        expected_css = """body,a,div .test #id,article{color:blue;}"""
+        self.assertEqual(css, expected_css)
+
+

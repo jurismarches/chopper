@@ -7,6 +7,7 @@ from lxml.etree import strip_attributes
 from six import string_types
 from six.moves.urllib.parse import urljoin
 from tinycss.css21 import RuleSet, ImportRule, MediaRule, PageRule
+from tinycss.parsing import split_on_comma, strip_whitespace
 
 from .parser import CSSParser
 from .rules import FontFaceRule
@@ -20,6 +21,7 @@ class Extractor(object):
     """
     # HTML specifics
     rel_to_abs_html_excluded_prefixes = ('#', 'javascript:', 'mailto:')
+
     javascript_open_re = re.compile(
         r'(?P<opening>open\([\"\'])(?P<url>.*)(?P<ending>[\"\']\))',
         re.IGNORECASE | re.MULTILINE | re.DOTALL)
@@ -27,6 +29,7 @@ class Extractor(object):
     # CSS specifics
     css_parser = CSSParser()
     xpath_translator = XpathTranslator()
+
     rel_to_abs_css_re = re.compile(
         r'url\(["\']?(?!data:)(?P<path>.*)["\']?\)',
         re.IGNORECASE | re.MULTILINE)
@@ -399,7 +402,7 @@ class Extractor(object):
         if isinstance(rule, RuleSet):
             # Simple CSS rule : a { color: red; }
             return '%s{%s}' % (
-                rule.selector.as_css(),
+                self._selector_as_string(rule.selector),
                 self._declarations_as_string(rule.declarations))
 
         elif isinstance(rule, ImportRule):
@@ -427,6 +430,19 @@ class Extractor(object):
                 self._declarations_as_string(rule.declarations))
 
         return ''
+
+    def _selector_as_string(self, selector):
+        """
+        Returns a selector as a CSS string
+
+        :param selector: A list of tinycss Tokens
+        :type selector: list
+        :returns: The CSS string for the selector
+        :rtype: str
+        """
+        return ','.join(
+            ''.join(token.as_css() for token in strip_whitespace(token_list))
+            for token_list in split_on_comma(selector))
 
     def _declarations_as_string(self, declarations):
         """

@@ -27,8 +27,8 @@ class TreeExtractor(object):
     css_parser = CSSParser()
     xpath_translator = XpathTranslator()
     rel_to_abs_css_re = re.compile(
-        r'url\(["\']?(?P<path>.*)["\']?\)',
-        re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        r'url\(["\']?(?!data:)(?P<path>.*)["\']?\)',
+        re.IGNORECASE | re.MULTILINE)
 
     def __init__(self):
 

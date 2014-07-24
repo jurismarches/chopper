@@ -1,5 +1,6 @@
 *
 !.gitignore
+!.coveragerc
 !.travis.yml
 !Makefile
 !LICENSE

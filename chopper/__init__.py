@@ -1,1 +1,1 @@
-from .extractor import TreeExtractor
+from .extractor import Extractor

@@ -20,7 +20,7 @@ Usage
 
 .. code-block:: python
 
-  from chopper import TreeExtractor
+  from chopper import Extractor
 
   HTML = """
   <html>
@@ -48,7 +48,7 @@ Usage
   div#footer { border-top: 2px solid red; }
   """
 
-  extractor = TreeExtractor().keep('//div[@class="iwantthis"]').discard('//a')
+  extractor = Extractor().keep('//div[@class="iwantthis"]').discard('//a')
   html, css = extractor.extract(HTML, CSS)
 
 The result is :

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from unittest import TestCase
 
-from .extractor import TreeExtractor
+from .extractor import Extractor
 
 
 TEST_HTML = """
@@ -44,10 +44,10 @@ span { color: red; }
 """
 
 
-class TreeExtractorTestCase(TestCase):
+class ExtractorTestCase(TestCase):
 
     def __init__(self, *args, **kwargs):
-        super(TreeExtractorTestCase, self).__init__(*args, **kwargs)
+        super(ExtractorTestCase, self).__init__(*args, **kwargs)
 
         if not hasattr(self, 'assertIsNone'):
             self.assertIsNone = lambda v: self.assertEqual(v, None)
@@ -59,7 +59,7 @@ class TreeExtractorTestCase(TestCase):
         """
         Tests an extractor without any rules
         """
-        extractor = TreeExtractor()
+        extractor = Extractor()
         html = extractor.extract(TEST_HTML)
 
         self.assertIsNone(html)
@@ -70,7 +70,7 @@ class TreeExtractorTestCase(TestCase):
         """
         sample_html = "<html><body><p>TEST</p></body></html>"
 
-        extractor = TreeExtractor().keep('//html')
+        extractor = Extractor().keep('//html')
         html = extractor.extract(sample_html)
 
         self.assertEqual(self.format_output(html), sample_html)
@@ -79,7 +79,7 @@ class TreeExtractorTestCase(TestCase):
         """
         Tests no keep rules matched
         """
-        extractor = TreeExtractor().keep('//section')
+        extractor = Extractor().keep('//section')
         html = extractor.extract(TEST_HTML)
 
         self.assertIsNone(html)
@@ -88,7 +88,7 @@ class TreeExtractorTestCase(TestCase):
         """
         Tests an extractor with a single keep rule
         """
-        extractor = TreeExtractor().keep('//a[@href="test"]')
+        extractor = Extractor().keep('//a[@href="test"]')
         html = extractor.extract(TEST_HTML)
 
         expected_html = """<html><body><div class="cls1"><a href="test">Test Link</a></div><div id="main"><a href="test">Test <em>Link</em></a></div></body></html>"""
@@ -99,7 +99,7 @@ class TreeExtractorTestCase(TestCase):
         """
         Tests an extractor with a single keep rule and a discard rule
         """
-        extractor = TreeExtractor().keep('//a[@href="test"]').discard('//em')
+        extractor = Extractor().keep('//a[@href="test"]').discard('//em')
         html = extractor.extract(TEST_HTML)
 
         expected_html = """<html><body><div class="cls1"><a href="test">Test Link</a></div><div id="main"><a href="test">Test </a></div></body></html>"""
@@ -110,7 +110,7 @@ class TreeExtractorTestCase(TestCase):
         """
         Tests a single keep rule with CSS
         """
-        extractor = TreeExtractor().keep('//strong')
+        extractor = Extractor().keep('//strong')
         html, css = extractor.extract(TEST_HTML, TEST_CSS)
 
         expected_html = """<html><body><div class="cls1"><p>Hello <strong>world</strong> !</p></div></body></html>"""
@@ -123,7 +123,7 @@ class TreeExtractorTestCase(TestCase):
         """
         Tests an extractor with a single keep rule and a discard rule with CSS
         """
-        extractor = TreeExtractor().keep('//footer').discard('//span')
+        extractor = Extractor().keep('//footer').discard('//span')
         html, css = extractor.extract(TEST_HTML, TEST_CSS)
 
         expected_html = """<html><body><footer>I am the </footer></body></html>"""
@@ -136,7 +136,7 @@ class TreeExtractorTestCase(TestCase):
         """
         Tests an extractor with multiple keep rules
         """
-        extractor = TreeExtractor().keep('//footer').keep('//div[@id="main"]')
+        extractor = Extractor().keep('//footer').keep('//div[@id="main"]')
         html = extractor.extract(TEST_HTML)
 
         expected_html = """<html><body><div id="main"><a href="test">Test <em>Link</em></a></div><footer>I am the <span>footer</span></footer></body></html>"""
@@ -147,7 +147,7 @@ class TreeExtractorTestCase(TestCase):
         """
         Tests an extractor with a global element discard but with a specific keep
         """
-        extractor = TreeExtractor().keep('//div[@id="main"]/a').discard('//a')
+        extractor = Extractor().keep('//div[@id="main"]/a').discard('//a')
         html = extractor.extract(TEST_HTML)
 
         expected_html = """<html><body><div id="main"><a href="test">Test <em>Link</em></a></div></body></html>"""
@@ -160,7 +160,7 @@ class TreeExtractorTestCase(TestCase):
         """
         input_css = """a { background: url('picture.jpg');}"""
 
-        extractor = TreeExtractor().keep('//div[@id="main"]/a').discard('//a')
+        extractor = Extractor().keep('//div[@id="main"]/a').discard('//a')
         html, css = extractor.extract(
             TEST_HTML, input_css, base_url='http://test.com', rel_to_abs=True)
 
@@ -210,7 +210,7 @@ class TreeExtractorTestCase(TestCase):
             background-image: url(data:image/png;base64,BASE64DATA)
         }
         """
-        extractor = TreeExtractor().keep('//div[@id="main"]/a').discard('//a')
+        extractor = Extractor().keep('//div[@id="main"]/a').discard('//a')
         _, css = extractor.extract(
             TEST_HTML, input_css, base_url='http://test.com/dir/', rel_to_abs=True)
 

@@ -13,7 +13,7 @@ from .rules import FontFaceRule
 from .translator import XpathTranslator
 
 
-class TreeExtractor(object):
+class Extractor(object):
     """
     Extracts HTML contents given a list of xpaths
     by preserving ancestors
@@ -50,7 +50,7 @@ class TreeExtractor(object):
         :type e: str
 
         :retuns: self
-        :rtype: TreeExtractor
+        :rtype: Extractor
         """
         self.__add(self._xpaths_to_keep, xpath)
         return self
@@ -63,7 +63,7 @@ class TreeExtractor(object):
         :type e: str
 
         :retuns: self
-        :rtype: TreeExtractor
+        :rtype: Extractor
         """
         self.__add(self._xpaths_to_discard, xpath)
         return self

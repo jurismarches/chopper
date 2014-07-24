@@ -11,7 +11,7 @@ class Extractor(object):
     by preserving ancestors
     """
     html_extractor = HTMLExtractor
-    css_extrator = CSSExtractor
+    css_extractor = CSSExtractor
 
     def __init__(self):
         # Keep Xpaths expressions
@@ -90,7 +90,7 @@ class Extractor(object):
         # Clean CSS
         if css_contents is not None:
 
-            css_extractor = self.css_extrator(css_contents, html_extractor.tree)
+            css_extractor = self.css_extractor(css_contents, html_extractor.tree)
             css_extractor.parse()
 
             # Relative to absolute URLs

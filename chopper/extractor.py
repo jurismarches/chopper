@@ -28,8 +28,8 @@ class Extractor(object):
         """
         Adds a keep Xpath expression
 
-        :param e: The Xpath expression to keep
-        :type e: str
+        :param xpath: The Xpath expression to keep
+        :type xpath: str
 
         :retuns: self
         :rtype: Extractor
@@ -41,8 +41,8 @@ class Extractor(object):
         """
         Adds a discard Xpath expression
 
-        :param e: The Xpath expression to discard
-        :type e: str
+        :param xpath: The Xpath expression to discard
+        :type xpath: str
 
         :retuns: self
         :rtype: Extractor

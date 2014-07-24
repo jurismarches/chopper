@@ -1,17 +1,8 @@
 # -*- coding:utf-8 -*-
-import re
-import cssselect
-from itertools import chain
-from lxml import html
-from lxml.etree import strip_attributes
 from six import string_types
-from six.moves.urllib.parse import urljoin
-from tinycss.css21 import RuleSet, ImportRule, MediaRule, PageRule
-from tinycss.parsing import split_on_comma, strip_whitespace
 
-from .parser import CSSParser
-from .rules import FontFaceRule
-from .translator import XpathTranslator
+from .css.extractor import CSSExtractor
+from .html.extractor import HTMLExtractor
 
 
 class Extractor(object):
@@ -19,20 +10,8 @@ class Extractor(object):
     Extracts HTML contents given a list of xpaths
     by preserving ancestors
     """
-    # HTML specifics
-    rel_to_abs_html_excluded_prefixes = ('#', 'javascript:', 'mailto:')
-
-    javascript_open_re = re.compile(
-        r'(?P<opening>open\([\"\'])(?P<url>.*)(?P<ending>[\"\']\))',
-        re.IGNORECASE | re.MULTILINE | re.DOTALL)
-
-    # CSS specifics
-    css_parser = CSSParser()
-    xpath_translator = XpathTranslator()
-
-    rel_to_abs_css_re = re.compile(
-        r'url\(["\']?(?!data:)(?P<path>.*)["\']?\)',
-        re.IGNORECASE | re.MULTILINE)
+    html_extractor = HTMLExtractor
+    css_extrator = CSSExtractor
 
     def __init__(self):
         # Keep Xpaths expressions
@@ -88,15 +67,22 @@ class Extractor(object):
         :returns: cleaned HTML contents, cleaned CSS contents
         :rtype: str or tuple
         """
+        # Whether rel_to_abs process is necessary or not
+        do_rel_to_abs = rel_to_abs and base_url is not None
+
         # Clean HTML
-        if self._extract_html(html_contents):
+        html_extractor = self.html_extractor(
+            html_contents, self._xpaths_to_keep, self._xpaths_to_discard)
+        has_matches = html_extractor.parse()
+
+        if has_matches:
 
             # Relative to absolute URLs
-            if rel_to_abs and base_url is not None:
-                self._rel_to_abs_html(base_url)
+            if do_rel_to_abs:
+                html_extractor.rel_to_abs(base_url)
 
             # Convert ElementTree to string
-            cleaned_html = html.tostring(self.tree).decode()
+            cleaned_html = html_extractor.to_string()
 
         else:
             cleaned_html = None
@@ -104,11 +90,14 @@ class Extractor(object):
         # Clean CSS
         if css_contents is not None:
 
-            cleaned_css = self._extract_css(css_contents)
+            css_extractor = self.css_extrator(css_contents, html_extractor.tree)
+            css_extractor.parse()
 
             # Relative to absolute URLs
-            if rel_to_abs and base_url is not None:
-                cleaned_css = self._rel_to_abs_css(base_url, cleaned_css)
+            if do_rel_to_abs:
+                css_extractor.rel_to_abs(base_url)
+
+            cleaned_css = css_extractor.to_string()
 
         else:
             return cleaned_html
@@ -130,389 +119,3 @@ class Extractor(object):
         """
         assert isinstance(e, string_types)
         dest.append(e)
-
-    ################
-    # HTML parsing #
-    ################
-
-    def _extract_html(self, html_contents):
-        """
-        Returns a cleaned lxml ElementTree
-
-        :param html_contents: The HTML contents to parse
-        :type html_contents: str
-
-        :returns: The cleaned lxml tree
-        :rtype: lxml.html.HtmlElement
-        """
-        # Create the ElementTree
-        self.tree = html.fromstring(html_contents)
-
-        # Get explicits elements to keep and discard
-        self.elts_to_keep = self._get_elements_to_keep()
-        self.elts_to_discard = self._get_elements_to_discard()
-
-        # Init an empty list of Elements to remove
-        self.elts_to_remove = []
-
-        # Check if the root is a match or if there is any matches
-        is_root = self._is_keep(self.tree)
-        has_descendant = self._has_keep_elt_in_descendants(self.tree)
-
-        if not(is_root or has_descendant):
-            return False
-
-        # Parse and clean the ElementTree
-        self._parse_element(self.tree, parent_is_keep=is_root)
-        self._remove_elements()
-
-        return True
-
-    def _get_elements(self, source):
-        """
-        Returns the list of HtmlElements for the source
-
-        :param source: The source list to parse
-        :type source: list
-        :returns: A list of HtmlElements
-        :rtype: list
-        """
-        return list(chain(*[self.tree.xpath(xpath) for xpath in source]))
-
-    def _get_elements_to_keep(self):
-        """
-        Returns a list of lxml Elements to keep
-
-        :returns: List of elements to keep
-        :rtype: list of lxml.html.HtmlElement
-        """
-        return self._get_elements(self._xpaths_to_keep)
-
-    def _get_elements_to_discard(self):
-        """
-        Returns a list of lxml Elements to discard
-
-        :returns: List of elements to discard
-        :rtype: list of lxml.html.HtmlElement
-        """
-        return self._get_elements(self._xpaths_to_discard)
-
-    def _parse_element(self, elt, parent_is_keep=False):
-        """
-        Parses an Element recursively
-
-        :param elt: HtmlElement to parse
-        :type elt: lxml.html.HtmlElement
-        :param parent_is_keep: Whether the element is inside a keep element or not
-        :type parent_is_keep: bool
-        """
-        for e in elt.iterchildren():
-
-            is_discard_element = self._is_discard(e)
-            is_keep_element = self._is_keep(e)
-
-            # Element is an explicit one to discard, flag it and continue
-            if is_discard_element and not is_keep_element:
-                self.elts_to_remove.append(e)
-                continue
-
-            if not parent_is_keep:
-                # Parent element is not an explicit keep, normal process
-                # Element is an explicit one to keep, inspect it
-                if is_keep_element:
-                    self._parse_element(e, parent_is_keep=True)
-                    continue
-
-                # Has a descendant to keep, inspect it
-                if self._has_keep_elt_in_descendants(e):
-                    self._parse_element(e)
-                    continue
-
-                # Element did not match anything, remove it
-                self.elts_to_remove.append(e)
-
-            else:
-                # Element is a child of a keep element, only check explicit discards
-                self._parse_element(e, parent_is_keep=True)
-
-    def _is_keep(self, elt):
-        """
-        Returns whether an Element is an explicit one to keep or not
-
-        :param elt: The HtmlElement to check
-        :type elt: str
-        :returns: True if the element is an explicit one to keep
-        :rtype: bool
-        """
-        return elt in self.elts_to_keep
-
-    def _is_discard(self, elt):
-        """
-        Returns whether an Element is an explicit one to discard or not
-
-        :param elt: The HtmlElement to check
-        :type elt: str
-        :returns: True if the element is an explicit one to discard
-        :rtype: bool
-        """
-        return elt in self.elts_to_discard
-
-    def _has_keep_elt_in_descendants(self, elt):
-        """
-        Returns whether the element has a descendant to keep or not
-
-        :param elt: The HtmlElement to check
-        :type elt: lxml.html.HtmlElement
-        :returns: True if the element has a keep element in its descendants
-        :rtype: bool
-        """
-        # iterdescendants is a generator, don't cast it as a list to avoid
-        # parsing the whole descendants tree if not necessary
-        for d in elt.iterdescendants():
-            if d in self.elts_to_keep:
-                return True
-
-        return False
-
-    def _remove_elements(self):
-        """
-        Removes flagged elements from the ElementTree
-        """
-        for e in self.elts_to_remove:
-
-            # Get the element parent
-            parent = e.getparent()
-
-            # lxml also remove the element tail, preserve it
-            if e.tail and e.tail.strip():
-                parent_text = parent.text or ''
-                parent.text = parent_text + e.tail
-
-            # Remove the element
-            e.getparent().remove(e)
-
-    def _rel_to_abs_html(self, base_url):
-        """
-        Converts relative links from html contents to absolute links
-
-        :param base_url: The base page url to use for building absolute links
-        :type base_url: str
-        """
-        # Delete target attributes
-        strip_attributes(self.tree, 'target')
-
-        # Absolute links
-        self.tree.rewrite_links(
-            lambda link: urljoin(base_url, link)
-            if not link.startswith(self.rel_to_abs_html_excluded_prefixes) else link)
-
-        # Extra attributes
-        onclick_elements = self.tree.xpath('//*[@onclick]')
-
-        for element in onclick_elements:
-            # Replace attribute with absolute URL
-            element.set('onclick', self.javascript_open_re.sub(
-                lambda match: '%s%s%s' % (match.group('opening'),
-                        urljoin(base_url, match.group('url')),
-                        match.group('ending')),
-                element.get('onclick')))
-
-    ###############
-    # CSS Parsing #
-    ###############
-
-    def _extract_css(self, css_contents):
-        """
-        Returns the cleaned css only matching the ElementTree
-
-        :param css_contents: The CSS contents to parse
-        :type css_contents: str
-        :returns: The cleaned CSS contents
-        :rtype: str
-        """
-        # Parse the CSS contents
-        stylesheet = self.css_parser.parse_stylesheet(
-            css_contents)
-
-        # Get the cleaned CSS contents
-        return self._clean_css(stylesheet)
-
-    def _clean_css(self, stylesheet):
-        """
-        Returns the cleaned CSS
-
-        :param stylesheet: The Stylesheet object to parse
-        :type stylesheet: tinycss.css21.Stylesheet
-        :returns: The cleaned CSS contents
-        :rtype: str
-        """
-        # Init the cleaned CSS rules and contents string
-        css_rules = []
-
-        # For every rule in the CSS
-        for rule in stylesheet.rules:
-
-            try:
-                # Clean the CSS rule
-                cleaned_rule = self._clean_rule(rule)
-
-                # Append the rule to matched CSS rules
-                if cleaned_rule is not None:
-                    css_rules.append(cleaned_rule)
-
-            except:
-                # On error, assume the rule matched the tree
-                css_rules.append(rule)
-
-        return self._build_css(css_rules)
-
-    def _clean_rule(self, rule):
-        """
-        Cleans a css Rule by removing Selectors without matches on the tree
-        Returns None if the whole rule do not match
-
-        :param rule: CSS Rule to check
-        :type rule: A tinycss Rule object
-        :returns: A cleaned tinycss Rule with only Selectors matching the tree or None
-        :rtype: tinycss Rule or None
-        """
-        # Always match @ rules
-        if rule.at_keyword is not None:
-            return rule
-
-        # Clean selectors
-        cleaned_token_list = []
-
-        for i, token_list in enumerate(split_on_comma(rule.selector)):
-
-            # If the token list matches the tree
-            if self._token_list_matches_tree(token_list):
-
-                # Add a Comma if multiple token lists matched
-                if i > 0:
-                    cleaned_token_list.append(
-                        cssselect.parser.Token('DELIM', ',', i + 1))
-
-                # Append it to the list of cleaned token list
-                cleaned_token_list += token_list
-
-        # Return None if selectors list is empty
-        if not cleaned_token_list:
-            return None
-
-        # Update rule token list
-        rule.selector = cleaned_token_list
-
-        # Return cleaned rule
-        return rule
-
-    def _token_list_matches_tree(self, token_list):
-        """
-        Returns whether the token list matches the HTML tree
-
-        :param selector: A Token list to check
-        :type selector: list of Token objects
-        :returns: True if the token list has matches in self.tree
-        :rtype: bool
-        """
-        try:
-            parsed_selector = cssselect.parse(
-                ''.join(token.as_css() for token in token_list))[0]
-
-            return bool(
-                self.tree.xpath(self.xpath_translator.selector_to_xpath(parsed_selector)))
-        except:
-            # On error, assume the selector matches the tree
-            return True
-
-    def _build_css(self, rules):
-        """
-        Returns a CSS string for the given rules
-
-        :param rules: List of tinycss Rule
-        :type rules: list of tinycss Rule objects
-        :returns: CSS contents for the rules
-        :rtype: string
-        """
-        # Build and return the cleaned CSS contents
-        return '\n'.join(self._rule_as_string(rule) for rule in rules)
-
-    def _rule_as_string(self, rule):
-        """
-        Converts a tinycss rule to a formatted CSS string
-
-        :param rule: The rule to format
-        :type rule: tinycss Rule object
-        :returns: The Rule as a CSS string
-        :rtype: str
-        """
-        if isinstance(rule, RuleSet):
-            # Simple CSS rule : a { color: red; }
-            return '%s{%s}' % (
-                self._selector_as_string(rule.selector),
-                self._declarations_as_string(rule.declarations))
-
-        elif isinstance(rule, ImportRule):
-            # @import rule
-            return "@import url('%s') %s;" % (
-                rule.uri, ','.join(rule.media))
-
-        elif isinstance(rule, FontFaceRule):
-            # @font-face rule
-            return "@font-face{%s}" % self._declarations_as_string(rule.declarations)
-
-        elif isinstance(rule, MediaRule):
-            # @media rule
-            return "@media %s{%s}" % (
-                ','.join(rule.media),
-                ''.join(self._rule_as_string(r) for r in rule.rules))
-
-        elif isinstance(rule, PageRule):
-            # @page rule
-            selector, pseudo = rule.selector
-
-            return "@page%s%s{%s}" % (
-                ' %s' % selector if selector else '',
-                ' :%s' % pseudo if pseudo else '',
-                self._declarations_as_string(rule.declarations))
-
-        return ''
-
-    def _selector_as_string(self, selector):
-        """
-        Returns a selector as a CSS string
-
-        :param selector: A list of tinycss Tokens
-        :type selector: list
-        :returns: The CSS string for the selector
-        :rtype: str
-        """
-        return ','.join(
-            ''.join(token.as_css() for token in strip_whitespace(token_list))
-            for token_list in split_on_comma(selector))
-
-    def _declarations_as_string(self, declarations):
-        """
-        Returns a list of declarations as a formatted CSS string
-
-        :param declarations: The list of tinycss Declarations to format
-        :type declarations: list of tinycss.css21.Declaration
-        :returns: The CSS string for the declarations list
-        :rtype: str
-        """
-        return ''.join('%s:%s;' % (d.name, d.value.as_css()) for d in declarations)
-
-    def _rel_to_abs_css(self, base_url, css_contents):
-        """
-        Converts relative links from css contents to absolute links
-
-        :param base_url: The base page url to use for building absolute links
-        :type base_url: str
-        :param css_contents: The CSS contents to parse
-        :type css_contents: str
-        :returns: The CSS contents with relative links converted to absolutes ones
-        :rtype: str
-        """
-        return self.rel_to_abs_css_re.sub(
-            lambda match: "url('%s')" % urljoin(base_url, match.group('path').strip('\'"')),
-            css_contents)

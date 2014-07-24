@@ -108,14 +108,14 @@ class Extractor(object):
     # Rules handling #
     ##################
 
-    def __add(self, dest, e):
+    def __add(self, dest, xpath):
         """
-        Adds a Xpath expression or HtmlElement to the dest list
+        Adds a Xpath expression to the dest list
 
-        :param dest: The destination list to add the element/Xpath
+        :param dest: The destination list to add the Xpath
         :type dest: list
-        :param e: The HtmlElement or Xpath expression to add
-        :type e: lxml.html.HtmlElement or str
+        :param xpath: The Xpath expression to add
+        :type xpath: str
         """
-        assert isinstance(e, string_types)
-        dest.append(e)
+        assert isinstance(xpath, string_types)
+        dest.append(xpath)

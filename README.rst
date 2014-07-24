@@ -1,8 +1,8 @@
-tree_extractor
-==============
+Chopper
+=======
 
-.. image:: https://travis-ci.org/jurismarches/tree_extractor.svg?branch=master
-    :target: https://travis-ci.org/jurismarches/tree_extractor
+.. image:: https://travis-ci.org/jurismarches/chopper.svg?branch=master
+    :target: https://travis-ci.org/jurismarches/chopper
 
 Extracts html contents by preserving ancestors and clean CSS
 
@@ -18,7 +18,7 @@ Usage
 
 .. code-block:: python
 
-  from tree_extractor import TreeExtractor
+  from chopper import TreeExtractor
 
   HTML = """
   <html>
@@ -37,7 +37,7 @@ Usage
     </body>
   </html>
   """
-  
+
   CSS = """
   div { border: 1px solid black; }
   div#main { color: blue; }
@@ -45,10 +45,10 @@ Usage
   a { color: green; }
   div#footer { border-top: 2px solid red; }
   """
-  
+
   extractor = TreeExtractor().keep('//div[@class="iwantthis"]').discard('//a')
   html, css = extractor.extract(HTML, CSS)
-  
+
 The result is :
 
 .. code-block:: python
@@ -64,7 +64,7 @@ The result is :
       </div>
     </body>
   </html>"""
-  
+
   >>> css
   """
   div{border:1px solid black;}

@@ -5,8 +5,8 @@
 !Makefile
 !LICENSE
 !AUTHORS
-!tree_extractor/
-!tree_extractor/*
+!chopper/
+!chopper/*
 !requirements.txt
 !requirements-dev.txt
 !setup.py

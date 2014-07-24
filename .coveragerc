@@ -1,2 +1,2 @@
 [run]
-include = tree_extractor/*
+include = chopper/*

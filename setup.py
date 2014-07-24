@@ -7,15 +7,15 @@ with open('README.rst', 'r') as f:
     long_description = f.read()
 
 setup(
-    name='tree_extractor',
+    name='chopper',
     version=VERSION,
     description="Lib to extract html elements by preserving ancestors and cleaning CSS",
     long_description=long_description,
     author=u'Jurismarchés',
     author_email='contact@jurismarches.com',
-    url='https://github.com/jurismarches/tree_extractor',
+    url='https://github.com/jurismarches/chopper',
     packages=[
-        'tree_extractor'
+        'chopper'
     ],
     install_requires=[
         'cssselect==0.9.1',
@@ -31,5 +31,5 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4'
     ],
-    test_suite='tree_extractor.tests'
+    test_suite='chopper.tests'
 )

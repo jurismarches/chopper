@@ -1,2 +1,2 @@
 tests:
-	nosetests --with-coverage --cover-package=tree_extractor
+	nosetests --with-coverage --cover-package=chopper

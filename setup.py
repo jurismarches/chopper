@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-VERSION = '0.1.9'
+VERSION = '0.1.10'
 
 with open('README.rst', 'r') as f:
     long_description = f.read()

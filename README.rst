@@ -3,6 +3,8 @@ Chopper
 
 .. image:: https://travis-ci.org/jurismarches/chopper.svg?branch=master
     :target: https://travis-ci.org/jurismarches/chopper
+.. image:: https://coveralls.io/repos/jurismarches/chopper/badge.png
+    :target: https://coveralls.io/r/jurismarches/chopper
 
 Extracts html contents by preserving ancestors and clean CSS
 

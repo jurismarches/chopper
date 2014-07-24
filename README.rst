@@ -1,4 +1,3 @@
-.. |axe| image:: http://icons.iconarchive.com/icons/aha-soft/desktop-halloween/32/Hatchet-icon.png
 |axe| Chopper
 =============
 
@@ -74,3 +73,5 @@ The result is :
   div#main{color:blue;}
   div.iwantthis{background-color:red;}
   """
+
+.. |axe| image:: http://icons.iconarchive.com/icons/aha-soft/desktop-halloween/32/Hatchet-icon.png

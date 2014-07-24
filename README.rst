@@ -1,5 +1,6 @@
-Chopper
-=======
+.. |axe| image:: http://icons.iconarchive.com/icons/aha-soft/desktop-halloween/32/Hatchet-icon.png
+|axe| Chopper
+=============
 
 .. image:: https://travis-ci.org/jurismarches/chopper.svg?branch=master
     :target: https://travis-ci.org/jurismarches/chopper
@@ -13,7 +14,7 @@ Compatible with Python >= 2.6, <= 3.4
 Installation
 ------------
 
-``pip install tree-extractor``
+``pip install chopper``
 
 Usage
 -----

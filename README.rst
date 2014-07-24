@@ -3,6 +3,10 @@ tree_extractor
 
 .. image:: https://travis-ci.org/jurismarches/tree_extractor.svg?branch=master
     :target: https://travis-ci.org/jurismarches/tree_extractor
+.. image:: https://coveralls.io/repos/jurismarches/tree_extractor/badge.png
+    :target: https://coveralls.io/r/jurismarches/tree_extractor
+
+
 
 Extracts html contents by preserving ancestors and clean CSS
 

@@ -361,7 +361,6 @@ class Extractor(object):
                     css_rules.append(cleaned_rule)
 
             except:
-                raise
                 # On error, assume the rule matched the tree
                 css_rules.append(rule)
 
@@ -423,7 +422,6 @@ class Extractor(object):
             return bool(
                 self.tree.xpath(self.xpath_translator.selector_to_xpath(parsed_selector)))
         except:
-            raise
             # On error, assume the selector matches the tree
             return True
 

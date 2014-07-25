@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-VERSION = '0.3.0'
+from chopper import __version__
+
 
 with open('README.rst', 'r') as f:
     long_description = f.read()
 
 setup(
     name='chopper',
-    version=VERSION,
+    version=__version__,
     description="Lib to extract html elements by preserving ancestors and cleaning CSS",
     long_description=long_description,
     author=u'Jurismarchés',

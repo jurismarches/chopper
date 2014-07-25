@@ -8,14 +8,14 @@ First, you need to import the |extractor| class :
 
 .. code-block:: python
 
-  from chopper import Extractor
+  from chopper.extractor import Extractor
 
 
 Then you can create an |extractor| instance by explicitly instantiating one or by directly using |keep| and |discard| class methods :
 
 .. code-block:: python
 
-  from chopper import Extractor
+  from chopper.extractor import Extractor
 
   # Instantiate style
   extractor = Extractor().keep('//div').discard('//a')
@@ -31,7 +31,7 @@ The |extractor| instance allows you to chain multiple |keep| and |discard|
 
 .. code-block:: python
 
-  from chopper import Extractor
+  from chopper.extractor import Extractor
 
   e = Extractor.keep('//div[p]').discard('//span').discard('//a').keep('strong')
 
@@ -45,7 +45,7 @@ If you want to also parse CSS, pass it as the second argument.
 
 .. code-block:: python
 
-  from chopper import Extractor
+  from chopper.extractor import Extractor
 
   HTML = """
   <html>
@@ -115,7 +115,7 @@ Chopper can also convert relative links to absolute ones. To do so, simply use t
 
 .. code-block:: python
 
-  from chopper import Extractor
+  from chopper.extractor import Extractor
 
   HTML = """
   <html>

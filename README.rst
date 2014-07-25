@@ -25,7 +25,7 @@ Quick start
 
 .. code-block:: python
 
-  from chopper import Extractor
+  from chopper.extractor import Extractor
 
   HTML = """
   <html>

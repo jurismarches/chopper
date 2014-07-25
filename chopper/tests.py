@@ -250,3 +250,74 @@ class ExtractorTestCase(TestCase):
 
         expected_css = """a,div,body{color:red;font-size:10px;}a{border:1px solid red;}"""
         self.assertEqual(self.format_output(css), expected_css)
+
+    def test_pseudo_css(self):
+        """
+        Tests pseudo CSS conversion
+        """
+        input_css = """
+        a:hover { background-color: red; }
+        a.red:visited { color: blue; }
+        """
+
+        extractor = Extractor().keep('//div[@id="main"]/a')
+        _, css = extractor.extract(TEST_HTML, input_css)
+
+        expected_css = """a:hover{background-color:red;}"""
+        self.assertEqual(self.format_output(css), expected_css)
+
+    def test_unknown_css_matches(self):
+        """
+        Tests that unknown pseudo CSS rules always matches
+        """
+        input_css = """
+        a::-moz-page-sequence {color:blue;}
+        """
+
+        extractor = Extractor().keep('//div[@id="main"]/a')
+        _, css = extractor.extract(TEST_HTML, input_css)
+
+        expected_css = """a::-moz-page-sequence{color:blue;}"""
+        self.assertEqual(self.format_output(css), expected_css)
+
+    def test_html_onclick_rel_to_abs(self):
+        """
+        Tests HTML with onlick attributes
+        """
+        input_html = """
+        <html>
+            <head>
+            </head>
+            <body>
+                <a onclick="open('page.html')">Hello world :)</a>
+            </body>
+        </html>
+        """
+
+        extractor = Extractor().keep('//*')
+        html = extractor.extract(
+            input_html, base_url='http://test.com/folder/hello.html', rel_to_abs=True)
+
+        expected_html = """<html><head></head><body><a onclick="open('http://test.com/folder/page.html')">Hello world :)</a></body></html>"""
+        self.assertEqual(self.format_output(html), expected_html)
+
+    def test_elements_with_tail(self):
+        """
+        Tests removing elements but preserving their tail
+        """
+        input_html = """
+        <html>
+            <head>
+            </head>
+            <body>
+                <p>Hello world :)</p>
+                NOPE
+            </body>
+        </html>
+        """
+
+        extractor = Extractor().keep('//body').discard('//p')
+        html = extractor.extract(input_html)
+
+        expected_html = """<html><body>NOPE</body></html>"""
+        self.assertEqual(self.format_output(html), expected_html)

@@ -4,8 +4,10 @@ from itertools import chain
 from lxml.etree import strip_attributes
 from six.moves.urllib.parse import urljoin
 
+from ..mixins import TreeBuilderMixin
 
-class HTMLExtractor(object):
+
+class HTMLExtractor(TreeBuilderMixin):
     """
     Extracts HTML contents given a list
     of xpaths to keep and to discard
@@ -43,7 +45,7 @@ class HTMLExtractor(object):
         :rtype: bool
         """
         # Create the element tree
-        self.tree = self._build_tree()
+        self.tree = self._build_tree(self.html_contents)
 
         # Get explicits elements to keep and discard
         self.elts_to_keep = self._get_elements_to_keep()
@@ -100,15 +102,6 @@ class HTMLExtractor(object):
     ###########
     # Private #
     ###########
-
-    def _build_tree(self):
-        """
-        Returns a HTML tree from the HTML contents
-
-        :returns: The parsed lxml element
-        :rtype: lxml.html.HtmlElement
-        """
-        return html.fromstring(self.html_contents)
 
     def _get_elements(self, source):
         """

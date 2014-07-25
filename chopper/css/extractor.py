@@ -8,8 +8,10 @@ from .parser import CSSParser
 from .rules import FontFaceRule
 from .translator import XpathTranslator
 
+from ..mixins import TreeBuilderMixin
 
-class CSSExtractor(object):
+
+class CSSExtractor(TreeBuilderMixin):
     """
     Extracts CSS rules only matching a html tree
     """
@@ -20,15 +22,17 @@ class CSSExtractor(object):
         r'url\(["\']?(?!data:)(?P<path>.*)["\']?\)',
         re.IGNORECASE | re.MULTILINE)
 
-    def __init__(self, css_contents, html_tree):
+    def __init__(self, css_contents, html_contents):
         """
         Inits the CSS extractor
 
         :param css_contents: The CSS contents to parse
         :type css_contents: str
+        :param html_contents: The HTML contents to parse
+        :type html_contents: str
         """
         self.css_contents = css_contents
-        self.html_tree = html_tree
+        self.html_contents = html_contents
         self.cleaned_css = ''
 
     ##########
@@ -42,6 +46,9 @@ class CSSExtractor(object):
         :returns: The cleaned CSS
         :rtype: str
         """
+        # Build the HTML tree
+        self.tree = self._build_tree(self.html_contents)
+
         # Parse the CSS contents
         self.stylesheet = self.parser.parse_stylesheet(self.css_contents)
 
@@ -148,7 +155,7 @@ class CSSExtractor(object):
 
         :param selector: A Token list to check
         :type selector: list of Token objects
-        :returns: True if the token list has matches in self.html_tree
+        :returns: True if the token list has matches in self.tree
         :rtype: bool
         """
         try:
@@ -156,7 +163,7 @@ class CSSExtractor(object):
                 ''.join(token.as_css() for token in token_list))[0]
 
             return bool(
-                self.html_tree.xpath(
+                self.tree.xpath(
                     self.xpath_translator.selector_to_xpath(parsed_selector)))
         except:
             # On error, assume the selector matches the tree

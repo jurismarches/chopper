@@ -9,6 +9,7 @@
 !chopper/**
 !docs/
 !docs/*.rst
+!docs/conf.py
 !requirements.txt
 !requirements-dev.txt
 !requirements-docs.txt

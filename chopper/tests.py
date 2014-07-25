@@ -330,3 +330,34 @@ class ExtractorTestCase(TestCase):
 
         self.assertEqual(len(extractor._xpaths_to_keep), 2)
         self.assertEqual(len(extractor._xpaths_to_discard), 1)
+
+    def test_unknown_css_at_rule_are_removed(self):
+        """
+        Tests that unknown CSS @ rules are removed
+        """
+        input_css = """
+        @foo url('lol.py');
+        body { color: red; }
+        """
+
+        extractor = Extractor.keep('//body')
+        _, css = extractor.extract(TEST_HTML, input_css)
+
+        expected_css = """body{color:red;}"""
+        self.assertEqual(self.format_output(css), expected_css)
+
+    def test_bad_css_rules_always_match(self):
+        """
+        Test that bad CSS rules always match 'as is'
+        """
+        input_css = """
+        @bar();
+        body < a { color: red; }
+        help << p { color: blue; }
+        """
+
+        extractor = Extractor.keep('//body')
+        _, css = extractor.extract(TEST_HTML, input_css)
+
+        expected_css = """body < a{color:red;}help << p{color:blue;}"""
+        self.assertEqual(self.format_output(css), expected_css)

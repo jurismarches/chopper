@@ -15,7 +15,9 @@ setup(
     author_email='contact@jurismarches.com',
     url='https://github.com/jurismarches/chopper',
     packages=[
-        'chopper'
+        'chopper',
+        'chopper.css',
+        'chopper.html',
     ],
     install_requires=[
         'cssselect==0.9.1',

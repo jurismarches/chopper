@@ -55,7 +55,7 @@ class Extractor(object):
         """
         return cls().discard(xpath)
 
-    def extract(self, html_contents, css_contents=None, base_url=None, rel_to_abs=False):
+    def extract(self, html_contents, css_contents=None, base_url=None):
         """
         Extracts the cleaned html tree as a string and only
         css rules matching the cleaned html tree
@@ -66,15 +66,10 @@ class Extractor(object):
         :type css_contents: str
         :param base_url: The base page URL to use for relative to absolute links
         :type base_url: str
-        :param rel_to_abs: Convert relative links to absolute ones
-        :type rel_to_abs: bool
 
         :returns: cleaned HTML contents, cleaned CSS contents
         :rtype: str or tuple
         """
-        # Whether rel_to_abs process is necessary or not
-        do_rel_to_abs = rel_to_abs and base_url is not None
-
         # Clean HTML
         html_extractor = self.html_extractor(
             html_contents, self._xpaths_to_keep, self._xpaths_to_discard)
@@ -83,7 +78,7 @@ class Extractor(object):
         if has_matches:
 
             # Relative to absolute URLs
-            if do_rel_to_abs:
+            if base_url is not None:
                 html_extractor.rel_to_abs(base_url)
 
             # Convert ElementTree to string
@@ -99,7 +94,7 @@ class Extractor(object):
             css_extractor.parse()
 
             # Relative to absolute URLs
-            if do_rel_to_abs:
+            if base_url is not None:
                 css_extractor.rel_to_abs(base_url)
 
             cleaned_css = css_extractor.to_string()

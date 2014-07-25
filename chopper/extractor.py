@@ -14,6 +14,11 @@ class Extractor(object):
     css_extractor = CSSExtractor
 
     def __init__(self):
+
+        # Expose public methods
+        self.keep = self._keep
+        self.discard = self._discard
+
         # Keep Xpaths expressions
         self._xpaths_to_keep = []
 
@@ -24,31 +29,31 @@ class Extractor(object):
     # Public #
     ##########
 
-    def keep(self, xpath):
+    @classmethod
+    def keep(cls, xpath):
         """
-        Adds a keep Xpath expression
+        Creates an instance of Extractor and adds a keep Xpath expression
 
         :param xpath: The Xpath expression to keep
         :type xpath: str
 
-        :retuns: self
+        :retuns: A new instance of Extractor
         :rtype: Extractor
         """
-        self.__add(self._xpaths_to_keep, xpath)
-        return self
+        return cls().keep(xpath)
 
-    def discard(self, xpath):
+    @classmethod
+    def discard(cls, xpath):
         """
-        Adds a discard Xpath expression
+        Creates an instance of Extractor and adds a discard Xpath expression
 
         :param xpath: The Xpath expression to discard
         :type xpath: str
 
-        :retuns: self
+        :retuns: A new instance of Extractor
         :rtype: Extractor
         """
-        self.__add(self._xpaths_to_discard, xpath)
-        return self
+        return cls().discard(xpath)
 
     def extract(self, html_contents, css_contents=None, base_url=None, rel_to_abs=False):
         """
@@ -107,6 +112,32 @@ class Extractor(object):
     ##################
     # Rules handling #
     ##################
+
+    def _keep(self, xpath):
+        """
+        Adds a keep Xpath expression
+
+        :param xpath: The Xpath expression to keep
+        :type xpath: str
+
+        :retuns: self
+        :rtype: Extractor
+        """
+        self.__add(self._xpaths_to_keep, xpath)
+        return self
+
+    def _discard(self, xpath):
+        """
+        Adds a discard Xpath expression
+
+        :param xpath: The Xpath expression to discard
+        :type xpath: str
+
+        :retuns: self
+        :rtype: Extractor
+        """
+        self.__add(self._xpaths_to_discard, xpath)
+        return self
 
     def __add(self, dest, xpath):
         """

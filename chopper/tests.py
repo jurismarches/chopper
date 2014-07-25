@@ -321,3 +321,12 @@ class ExtractorTestCase(TestCase):
 
         expected_html = """<html><body>NOPE</body></html>"""
         self.assertEqual(self.format_output(html), expected_html)
+
+    def test_classmethods(self):
+        """
+        Tests creation with classmethods
+        """
+        extractor = Extractor.keep('//a').keep('//p').discard('//div')
+
+        self.assertEqual(len(extractor._xpaths_to_keep), 2)
+        self.assertEqual(len(extractor._xpaths_to_discard), 1)

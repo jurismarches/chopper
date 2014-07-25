@@ -6,7 +6,7 @@
 !LICENSE
 !AUTHORS
 !chopper/
-!chopper/*
+!chopper/**
 !requirements.txt
 !requirements-dev.txt
 !setup.py

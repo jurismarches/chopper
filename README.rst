@@ -1,10 +1,7 @@
 |axe| Chopper
 =============
 
-.. image:: https://travis-ci.org/jurismarches/chopper.svg?branch=master
-    :target: https://travis-ci.org/jurismarches/chopper
-.. image:: https://coveralls.io/repos/jurismarches/chopper/badge.png
-    :target: https://coveralls.io/r/jurismarches/chopper
+|pypi| |travis| |coveralls|
 
 Extracts html contents by preserving ancestors and clean CSS
 
@@ -75,3 +72,9 @@ The result is :
   """
 
 .. |axe| image:: http://icons.iconarchive.com/icons/aha-soft/desktop-halloween/32/Hatchet-icon.png
+.. |pypi| image:: http://img.shields.io/pypi/v/chopper.svg?style=flat
+    :target: https://pypi.python.org/pypi/chopper
+.. |travis| image:: http://img.shields.io/travis/jurismarches/chopper/master.svg?style=flat
+    :target: https://travis-ci.org/jurismarches/chopper
+.. |coveralls| image:: http://img.shields.io/coveralls/jurismarches/chopper/master.svg?style=flat
+    :target: https://coveralls.io/r/jurismarches/chopper

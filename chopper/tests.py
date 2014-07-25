@@ -185,6 +185,9 @@ class ExtractorTestCase(TestCase):
         self.assertEqual(self.format_output(css), expected_css)
 
     def test_css_at_rules(self):
+        """
+        Tests CSS parsing with multiple @ rules
+        """
         input_css = """
         @import 'test.css';
         @import url(http://website.com/css/style.css);

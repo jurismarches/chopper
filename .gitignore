@@ -7,8 +7,11 @@
 !AUTHORS
 !chopper/
 !chopper/**
+!docs/
+!docs/*.rst
 !requirements.txt
 !requirements-dev.txt
+!requirements-docs.txt
 !setup.py
 __pycache__/
 *.py[cod]

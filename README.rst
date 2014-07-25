@@ -3,17 +3,25 @@
 
 |pypi| |travis| |coveralls|
 
-Extracts html contents by preserving ancestors and clean CSS
+Chopper is a tool to extract elements from HTML by preserving ancestors and CSS rules.
 
 Compatible with Python >= 2.6, <= 3.4
+
 
 Installation
 ------------
 
 ``pip install chopper``
 
-Usage
------
+
+Full documentation
+------------------
+
+http://chopper.readthedocs.org/en/latest/
+
+
+Quick start
+-----------
 
 .. code-block:: python
 
@@ -45,7 +53,7 @@ Usage
   div#footer { border-top: 2px solid red; }
   """
 
-  extractor = Extractor().keep('//div[@class="iwantthis"]').discard('//a')
+  extractor = Extractor.keep('//div[@class="iwantthis"]').discard('//a')
   html, css = extractor.extract(HTML, CSS)
 
 The result is :

@@ -77,7 +77,7 @@ If you want to also parse CSS, pass it as the second argument.
   html = e.extract(HTML)
 
   >>> html
-  >>> """
+  """
   <html>
     <body>
       <div>
@@ -91,7 +91,7 @@ If you want to also parse CSS, pass it as the second argument.
   html, css = e.extract(HTML, CSS)
 
   >>> html
-  >>> """
+  """
   <html>
     <body>
       <div>
@@ -102,7 +102,7 @@ If you want to also parse CSS, pass it as the second argument.
   """
 
   >>> css
-  >>> """
+  """
   p{color:red;}
   body{background-color:green;}
   """
@@ -134,7 +134,7 @@ Chopper can also convert relative links to absolute ones. To do so, simply use t
   html = Extractor.keep('//a').extract(HTML, base_url='http://test.com/path/index.html')
 
   >>> html
-  >>> """
+  """
   <html>
     <body>
       <div>

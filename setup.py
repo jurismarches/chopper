@@ -12,7 +12,7 @@ setup(
     version=__version__,
     description="Lib to extract html elements by preserving ancestors and cleaning CSS",
     long_description=long_description,
-    author=u'Jurismarchés',
+    author='Jurismarches',
     author_email='contact@jurismarches.com',
     url='https://github.com/jurismarches/chopper',
     packages=[

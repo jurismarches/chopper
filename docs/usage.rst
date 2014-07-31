@@ -43,6 +43,11 @@ Once your |extractor| instance is created you can call the |extract| method on i
 
 If you want to also parse CSS, pass it as the second argument.
 
+.. warning::
+
+  Depending on the CSS content size, CSS parsing and cleaning can be really slow compared
+  to HTML parsing and cleaning.
+
 .. code-block:: python
 
   from chopper.extractor import Extractor

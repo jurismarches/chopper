@@ -348,7 +348,7 @@ class ExtractorTestCase(TestCase):
 
     def test_bad_css_rules_always_match(self):
         """
-        Test that bad CSS rules always match 'as is'
+        Tests that bad CSS rules always match 'as is'
         """
         input_css = """
         @bar();
@@ -360,4 +360,39 @@ class ExtractorTestCase(TestCase):
         _, css = extractor.extract(TEST_HTML, input_css)
 
         expected_css = """body < a{color:red;}help << p{color:blue;}"""
+        self.assertEqual(self.format_output(css), expected_css)
+
+    def test_css_rel_to_abs_non_regression(self):
+        """
+        Tests css rel to abs quote fix
+        """
+        input_css = """
+        @font-face {
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 700;
+          src: local('Font'), local('Font'), url(font.woff) format('woff');
+        }
+        @font-face {
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 700;
+          src: local('Font'), local('Font'), url('font.woff') format('woff');
+        }
+        @font-face {
+          font-family: 'Roboto';
+          font-style: normal;
+          font-weight: 700;
+          src: local('Font'), local('Font'), url("font.woff") format('woff');
+        }"""
+
+        _, css = Extractor.keep('//*').extract(
+            TEST_HTML, input_css, base_url='http://website.com/dir/page.html')
+
+        expected_css = (
+            """@font-face{font-family:'Roboto';font-style:normal;font-weight:700;src:local('Font'), local('Font'), url('http://website.com/dir/font.woff') format('woff');}"""
+            """@font-face{font-family:'Roboto';font-style:normal;font-weight:700;src:local('Font'), local('Font'), url('http://website.com/dir/font.woff') format('woff');}"""
+            """@font-face{font-family:'Roboto';font-style:normal;font-weight:700;src:local('Font'), local('Font'), url('http://website.com/dir/font.woff') format('woff');}"""
+        )
+
         self.assertEqual(self.format_output(css), expected_css)

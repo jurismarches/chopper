@@ -19,7 +19,7 @@ class CSSExtractor(TreeBuilderMixin):
     xpath_translator = XpathTranslator()
 
     rel_to_abs_re = re.compile(
-        r'url\(["\']?(?!data:)(?P<path>.*)["\']?\)',
+        r'url\(["\']?(?!data:)(?P<path>[^\)]*)["\']?\)',
         re.IGNORECASE | re.MULTILINE)
 
     def __init__(self, css_contents, html_contents):

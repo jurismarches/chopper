@@ -90,14 +90,19 @@ class Extractor(object):
         # Clean CSS
         if css_contents is not None:
 
-            css_extractor = self.css_extractor(css_contents, cleaned_html)
-            css_extractor.parse()
+            if cleaned_html is not None:
 
-            # Relative to absolute URLs
-            if base_url is not None:
-                css_extractor.rel_to_abs(base_url)
+                css_extractor = self.css_extractor(css_contents, cleaned_html)
+                css_extractor.parse()
 
-            cleaned_css = css_extractor.to_string()
+                # Relative to absolute URLs
+                if base_url is not None:
+                    css_extractor.rel_to_abs(base_url)
+
+                cleaned_css = css_extractor.to_string()
+
+            else:
+                cleaned_css = None
 
         else:
             return cleaned_html

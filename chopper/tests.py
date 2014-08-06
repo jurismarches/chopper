@@ -396,3 +396,13 @@ class ExtractorTestCase(TestCase):
         )
 
         self.assertEqual(self.format_output(css), expected_css)
+
+    def test_css_parsing_when_html_has_no_matches_non_regression(self):
+        """
+        Tests CSS parsing when HTML didn't match
+        """
+        html, css = Extractor.keep('//div[@id="doesnotexists"]').extract(
+            TEST_HTML, TEST_CSS)
+
+        self.assertIsNone(html)
+        self.assertIsNone(css)

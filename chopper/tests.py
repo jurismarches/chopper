@@ -406,3 +406,20 @@ class ExtractorTestCase(TestCase):
 
         self.assertIsNone(html)
         self.assertIsNone(css)
+
+    def test_img_src_rel_to_abs(self):
+        """
+        Tests images SRC attribute rel to abs
+        """
+        input_html = """
+        <html>
+            <body>
+                <img alt="Test" src="../img/cool-picture.png">
+            </body>
+        </html>"""
+
+        html = Extractor.keep('//img').extract(
+            input_html, base_url='https://website.com/section/category/index.html')
+
+        expected_html = """<html><body><img alt="Test" src="https://website.com/section/img/cool-picture.png"></body></html>"""
+        self.assertEqual(self.format_output(html), expected_html)

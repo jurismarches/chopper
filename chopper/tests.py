@@ -423,3 +423,31 @@ class ExtractorTestCase(TestCase):
 
         expected_html = """<html><body><img alt="Test" src="https://website.com/section/img/cool-picture.png"></body></html>"""
         self.assertEqual(self.format_output(html), expected_html)
+
+    def test_css_multiline_non_regression(self):
+        """
+        Tests multiline CSS parsing
+        """
+        input_html = """
+        <html>
+            <body>
+                <span class="need"></span>
+            </body>
+        </html>
+        """
+
+        input_css = """
+        .hello world this .is a .test,
+        .ineed more .tests,
+        .more tests,
+        body span.need,
+        .do not .want,
+        body {
+            color: blue;
+        }
+        """
+
+        _, css = Extractor.keep("//span[@class='need']").extract(input_html, input_css)
+        expected_css = "body span.need,body{color:blue;}"
+
+        self.assertEqual(self.format_output(css), expected_css)

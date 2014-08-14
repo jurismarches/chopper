@@ -126,15 +126,15 @@ class CSSExtractor(TreeBuilderMixin):
         # Clean selectors
         cleaned_token_list = []
 
-        for i, token_list in enumerate(split_on_comma(rule.selector)):
+        for token_list in split_on_comma(rule.selector):
 
             # If the token list matches the tree
             if self._token_list_matches_tree(token_list):
 
                 # Add a Comma if multiple token lists matched
-                if i > 0:
+                if len(cleaned_token_list) > 0:
                     cleaned_token_list.append(
-                        cssselect.parser.Token('DELIM', ',', i + 1))
+                        cssselect.parser.Token('DELIM', ',', len(cleaned_token_list) + 1))
 
                 # Append it to the list of cleaned token list
                 cleaned_token_list += token_list

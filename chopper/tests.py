@@ -451,3 +451,27 @@ class ExtractorTestCase(TestCase):
         expected_css = "body span.need,body{color:blue;}"
 
         self.assertEqual(self.format_output(css), expected_css)
+
+    def test_css_priority(self):
+        """
+        Tests CSS parsing keeps priorities
+        """
+        input_html = """
+        <html>
+            <body>
+                <span class="need"></span>
+            </body>
+        </html>
+        """
+
+        input_css = """
+        .need {
+            color: blue;
+            background-color: red   !important ;
+        }
+        """
+
+        _, css = Extractor.keep("//span[@class='need']").extract(input_html, input_css)
+        expected_css = """.need{color:blue;background-color:red !important;}"""
+
+        self.assertEqual(self.format_output(css), expected_css)

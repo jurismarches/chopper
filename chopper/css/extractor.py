@@ -244,4 +244,7 @@ class CSSExtractor(TreeBuilderMixin):
         :returns: The CSS string for the declarations list
         :rtype: str
         """
-        return ''.join('%s:%s;' % (d.name, d.value.as_css()) for d in declarations)
+        return ''.join('%s:%s%s;' % (
+            d.name,
+            d.value.as_css(),
+            ' !' + d.priority if d.priority else '') for d in declarations)

@@ -15,7 +15,7 @@ class HTMLExtractor(TreeBuilderMixin):
     rel_to_abs_excluded_prefixes = ('#', 'javascript:', 'mailto:')
 
     javascript_open_re = re.compile(
-        r'(?P<opening>open\([\"\'])(?P<url>.*)(?P<ending>[\"\']\))',
+        r'(?P<opening>(?:open\(|\.href=)[\"\'])(?P<url>.*)(?P<ending>[\"\']\)?)',
         re.IGNORECASE | re.MULTILINE | re.DOTALL)
 
     def __init__(self, html_contents, xpaths_to_keep, xpaths_to_discard):

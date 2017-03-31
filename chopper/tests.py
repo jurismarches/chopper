@@ -280,7 +280,7 @@ class ExtractorTestCase(TestCase):
         expected_css = """a::-moz-page-sequence{color:blue;}"""
         self.assertEqual(self.format_output(css), expected_css)
 
-    def test_html_onclick_rel_to_abs(self):
+    def test_html_onclick_rel_to_abs_open(self):
         """
         Tests HTML with onlick attributes
         """
@@ -299,6 +299,27 @@ class ExtractorTestCase(TestCase):
             input_html, base_url='http://test.com/folder/hello.html')
 
         expected_html = """<html><head></head><body><a onclick="open('http://test.com/folder/page.html')">Hello world :)</a></body></html>"""
+        self.assertEqual(self.format_output(html), expected_html)
+
+    def test_html_onclick_rel_to_abs_href(self):
+        """
+        Tests HTML with onlick attributes
+        """
+        input_html = """
+        <html>
+            <head>
+            </head>
+            <body>
+                <a onclick="document.location.href='page.html'">Hello world :)</a>
+            </body>
+        </html>
+        """
+
+        extractor = Extractor().keep('//*')
+        html = extractor.extract(
+            input_html, base_url='http://test.com/folder/hello.html')
+
+        expected_html = """<html><head></head><body><a onclick="document.location.href='http://test.com/folder/page.html'">Hello world :)</a></body></html>"""
         self.assertEqual(self.format_output(html), expected_html)
 
     def test_elements_with_tail(self):

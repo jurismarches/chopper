@@ -24,7 +24,7 @@ setup(
         'cssselect==0.9.1',
         'tinycss==0.3',
         'lxml==3.3.5',
-        'six==1.7.3'
+        'six==1.11.0'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

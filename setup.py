@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'cssselect==0.9.1',
         'tinycss==0.3',
-        'lxml==3.3.5',
+        'lxml==4.6.5',
         'six==1.11.0'
     ],
     classifiers=[

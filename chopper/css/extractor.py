@@ -1,14 +1,14 @@
 import re
-import cssselect
 from urllib.parse import urljoin
-from tinycss.css21 import RuleSet, ImportRule, MediaRule, PageRule
+
+import cssselect
+from tinycss.css21 import ImportRule, MediaRule, PageRule, RuleSet
 from tinycss.parsing import split_on_comma, strip_whitespace
 
+from ..mixins import TreeBuilderMixin
 from .parser import CSSParser
 from .rules import FontFaceRule
 from .translator import XpathTranslator
-
-from ..mixins import TreeBuilderMixin
 
 
 class CSSExtractor(TreeBuilderMixin):
@@ -103,7 +103,7 @@ class CSSExtractor(TreeBuilderMixin):
                 if cleaned_rule is not None:
                     css_rules.append(cleaned_rule)
 
-            except:
+            except Exception:
                 # On error, assume the rule matched the tree
                 css_rules.append(rule)
 
@@ -165,7 +165,7 @@ class CSSExtractor(TreeBuilderMixin):
             return bool(
                 self.tree.xpath(
                     self.xpath_translator.selector_to_xpath(parsed_selector)))
-        except:
+        except Exception:
             # On error, assume the selector matches the tree
             return True
 

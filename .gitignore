@@ -14,5 +14,6 @@
 !requirements-dev.txt
 !requirements-docs.txt
 !setup.py
+!setup.cfg
 __pycache__/
 *.py[cod]

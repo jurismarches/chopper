@@ -3,7 +3,6 @@ from unittest import TestCase
 
 from .extractor import Extractor
 
-
 TEST_HTML = """
 <html>
     <head>
@@ -53,7 +52,7 @@ class ExtractorTestCase(TestCase):
             self.assertIsNone = lambda v: self.assertEqual(v, None)
 
     def format_output(self, output):
-        return ''.join(l.strip() for l in output.splitlines())
+        return ''.join(line.strip() for line in output.splitlines())
 
     def test_no_rules(self):
         """

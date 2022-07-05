@@ -1,8 +1,9 @@
 import re
-from lxml import html
 from itertools import chain
+from urllib.parse import urljoin
+
+from lxml import html
 from lxml.etree import strip_attributes
-from six.moves.urllib.parse import urljoin
 
 from ..mixins import TreeBuilderMixin
 

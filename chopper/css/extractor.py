@@ -1,6 +1,6 @@
 import re
 import cssselect
-from six.moves.urllib.parse import urljoin
+from urllib.parse import urljoin
 from tinycss.css21 import RuleSet, ImportRule, MediaRule, PageRule
 from tinycss.parsing import split_on_comma, strip_whitespace
 

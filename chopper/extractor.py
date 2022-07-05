@@ -1,6 +1,4 @@
 # -*- coding:utf-8 -*-
-from six import string_types
-
 from .css.extractor import CSSExtractor
 from .html.extractor import HTMLExtractor
 
@@ -148,5 +146,5 @@ class Extractor(object):
         :param xpath: The Xpath expression to add
         :type xpath: str
         """
-        assert isinstance(xpath, string_types)
+        assert isinstance(xpath, str)
         dest.append(xpath)

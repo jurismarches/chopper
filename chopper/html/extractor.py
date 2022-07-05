@@ -2,7 +2,7 @@ import re
 from lxml import html
 from itertools import chain
 from lxml.etree import strip_attributes
-from six.moves.urllib.parse import urljoin
+from urllib.parse import urljoin
 
 from ..mixins import TreeBuilderMixin
 

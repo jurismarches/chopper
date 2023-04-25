@@ -59,7 +59,7 @@ class HTMLExtractor(TreeBuilderMixin):
         is_root = self._is_keep(self.tree)
         has_descendant = self._has_keep_elt_in_descendants(self.tree)
 
-        if not(is_root or has_descendant):
+        if not (is_root or has_descendant):
             return False
 
         # Parse and clean the ElementTree

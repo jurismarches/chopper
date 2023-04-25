@@ -5,6 +5,7 @@ class XpathTranslator(HTMLTranslator):
     """
     Custom xpath translator
     """
+
     def pseudo_matches_if_exists(self, xpath):
         """
         Returns the default xpath

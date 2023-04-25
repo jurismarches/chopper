@@ -13,11 +13,13 @@ class HTMLExtractor(TreeBuilderMixin):
     Extracts HTML contents given a list
     of xpaths to keep and to discard
     """
-    rel_to_abs_excluded_prefixes = ('#', 'javascript:', 'mailto:')
+
+    rel_to_abs_excluded_prefixes = ("#", "javascript:", "mailto:")
 
     javascript_open_re = re.compile(
-        r'(?P<opening>(?:open\(|\.href=)[\"\'])(?P<url>.*)(?P<ending>[\"\']\)?)',
-        re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        r"(?P<opening>(?:open\(|\.href=)[\"\'])(?P<url>.*)(?P<ending>[\"\']\)?)",
+        re.IGNORECASE | re.MULTILINE | re.DOTALL,
+    )
 
     def __init__(self, html_contents, xpaths_to_keep, xpaths_to_discard):
         """
@@ -73,23 +75,32 @@ class HTMLExtractor(TreeBuilderMixin):
         Converts relative links from html contents to absolute links
         """
         # Delete target attributes
-        strip_attributes(self.tree, 'target')
+        strip_attributes(self.tree, "target")
 
         # Absolute links
         self.tree.rewrite_links(
             lambda link: urljoin(base_url, link)
-            if not link.startswith(self.rel_to_abs_excluded_prefixes) else link)
+            if not link.startswith(self.rel_to_abs_excluded_prefixes)
+            else link
+        )
 
         # Extra attributes
-        onclick_elements = self.tree.xpath('//*[@onclick]')
+        onclick_elements = self.tree.xpath("//*[@onclick]")
 
         for element in onclick_elements:
             # Replace attribute with absolute URL
-            element.set('onclick', self.javascript_open_re.sub(
-                lambda match: '%s%s%s' % (match.group('opening'),
-                        urljoin(base_url, match.group('url')),
-                        match.group('ending')),
-                element.get('onclick')))
+            element.set(
+                "onclick",
+                self.javascript_open_re.sub(
+                    lambda match: "%s%s%s"
+                    % (
+                        match.group("opening"),
+                        urljoin(base_url, match.group("url")),
+                        match.group("ending"),
+                    ),
+                    element.get("onclick"),
+                ),
+            )
 
     def to_string(self):
         """
@@ -143,7 +154,6 @@ class HTMLExtractor(TreeBuilderMixin):
         :type parent_is_keep: bool
         """
         for e in elt.iterchildren():
-
             is_discard_element = self._is_discard(e)
             is_keep_element = self._is_keep(e)
 
@@ -215,13 +225,12 @@ class HTMLExtractor(TreeBuilderMixin):
         Removes flagged elements from the ElementTree
         """
         for e in elts_to_remove:
-
             # Get the element parent
             parent = e.getparent()
 
             # lxml also remove the element tail, preserve it
             if e.tail and e.tail.strip():
-                parent_text = parent.text or ''
+                parent_text = parent.text or ""
                 parent.text = parent_text + e.tail
 
             # Remove the element

@@ -1,9 +1,9 @@
-
-class FontFaceRule(object):
+class FontFaceRule:
     """
     @font-face rule
     """
-    at_keyword = '@font-face'
+
+    at_keyword = "@font-face"
 
     def __init__(self, declarations, line, column):
         self.declarations = declarations

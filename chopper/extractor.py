@@ -3,16 +3,16 @@ from .css.extractor import CSSExtractor
 from .html.extractor import HTMLExtractor
 
 
-class Extractor(object):
+class Extractor:
     """
     Extracts HTML contents given a list of xpaths
     by preserving ancestors
     """
+
     html_extractor = HTMLExtractor
     css_extractor = CSSExtractor
 
     def __init__(self):
-
         # Expose public methods
         self.keep = self._keep
         self.discard = self._discard
@@ -70,11 +70,11 @@ class Extractor(object):
         """
         # Clean HTML
         html_extractor = self.html_extractor(
-            html_contents, self._xpaths_to_keep, self._xpaths_to_discard)
+            html_contents, self._xpaths_to_keep, self._xpaths_to_discard
+        )
         has_matches = html_extractor.parse()
 
         if has_matches:
-
             # Relative to absolute URLs
             if base_url is not None:
                 html_extractor.rel_to_abs(base_url)
@@ -87,9 +87,7 @@ class Extractor(object):
 
         # Clean CSS
         if css_contents is not None:
-
             if cleaned_html is not None:
-
                 css_extractor = self.css_extractor(css_contents, cleaned_html)
                 css_extractor.parse()
 

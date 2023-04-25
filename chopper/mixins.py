@@ -1,11 +1,12 @@
 from lxml import html
 
 
-class TreeBuilderMixin(object):
+class TreeBuilderMixin:
     """
     Adds a '_build_tree' method that returns an lxml HtmlElement
     from a HTML contents string
     """
+
     def _build_tree(self, html_contents):
         """
         Returns a HTML tree from the HTML contents

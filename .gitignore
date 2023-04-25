@@ -1,5 +1,4 @@
 .coverage
-.github
 .venv
 build
 *.egg-info/

@@ -1,7 +1,7 @@
 |axe| Chopper
 =============
 
-|pypi| |travis| |coveralls|
+|pypi| ![github actions badge](https://github.com/jurismarches/chopper/actions/workflows/ci.yml/badge.svg)
 
 Chopper is a tool to extract elements from HTML by preserving ancestors and CSS rules.
 

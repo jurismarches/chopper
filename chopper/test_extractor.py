@@ -44,15 +44,14 @@ span { color: red; }
 
 
 class ExtractorTestCase(TestCase):
-
     def __init__(self, *args, **kwargs):
-        super(ExtractorTestCase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-        if not hasattr(self, 'assertIsNone'):
+        if not hasattr(self, "assertIsNone"):
             self.assertIsNone = lambda v: self.assertEqual(v, None)
 
     def format_output(self, output):
-        return ''.join(line.strip() for line in output.splitlines())
+        return "".join(line.strip() for line in output.splitlines())
 
     def test_no_rules(self):
         """
@@ -69,7 +68,7 @@ class ExtractorTestCase(TestCase):
         """
         sample_html = "<html><body><p>TEST</p></body></html>"
 
-        extractor = Extractor().keep('//html')
+        extractor = Extractor().keep("//html")
         html = extractor.extract(sample_html)
 
         self.assertEqual(self.format_output(html), sample_html)
@@ -78,7 +77,7 @@ class ExtractorTestCase(TestCase):
         """
         Tests no keep rules matched
         """
-        extractor = Extractor().keep('//section')
+        extractor = Extractor().keep("//section")
         html = extractor.extract(TEST_HTML)
 
         self.assertIsNone(html)
@@ -98,7 +97,7 @@ class ExtractorTestCase(TestCase):
         """
         Tests an extractor with a single keep rule and a discard rule
         """
-        extractor = Extractor().keep('//a[@href="test"]').discard('//em')
+        extractor = Extractor().keep('//a[@href="test"]').discard("//em")
         html = extractor.extract(TEST_HTML)
 
         expected_html = """<html><body><div class="cls1"><a href="test">Test Link</a></div><div id="main"><a href="test">Test </a></div></body></html>"""
@@ -109,7 +108,7 @@ class ExtractorTestCase(TestCase):
         """
         Tests a single keep rule with CSS
         """
-        extractor = Extractor().keep('//strong')
+        extractor = Extractor().keep("//strong")
         html, css = extractor.extract(TEST_HTML, TEST_CSS)
 
         expected_html = """<html><body><div class="cls1"><p>Hello <strong>world</strong> !</p></div></body></html>"""
@@ -122,7 +121,7 @@ class ExtractorTestCase(TestCase):
         """
         Tests an extractor with a single keep rule and a discard rule with CSS
         """
-        extractor = Extractor().keep('//footer').discard('//span')
+        extractor = Extractor().keep("//footer").discard("//span")
         html, css = extractor.extract(TEST_HTML, TEST_CSS)
 
         expected_html = """<html><body><footer>I am the </footer></body></html>"""
@@ -135,7 +134,7 @@ class ExtractorTestCase(TestCase):
         """
         Tests an extractor with multiple keep rules
         """
-        extractor = Extractor().keep('//footer').keep('//div[@id="main"]')
+        extractor = Extractor().keep("//footer").keep('//div[@id="main"]')
         html = extractor.extract(TEST_HTML)
 
         expected_html = """<html><body><div id="main"><a href="test">Test <em>Link</em></a></div><footer>I am the <span>footer</span></footer></body></html>"""
@@ -146,7 +145,7 @@ class ExtractorTestCase(TestCase):
         """
         Tests an extractor with a global element discard but with a specific keep
         """
-        extractor = Extractor().keep('//div[@id="main"]/a').discard('//a')
+        extractor = Extractor().keep('//div[@id="main"]/a').discard("//a")
         html = extractor.extract(TEST_HTML)
 
         expected_html = """<html><body><div id="main"><a href="test">Test <em>Link</em></a></div></body></html>"""
@@ -159,9 +158,8 @@ class ExtractorTestCase(TestCase):
         """
         input_css = """a { background: url('picture.jpg');}"""
 
-        extractor = Extractor().keep('//div[@id="main"]/a').discard('//a')
-        html, css = extractor.extract(
-            TEST_HTML, input_css, base_url='http://test.com')
+        extractor = Extractor().keep('//div[@id="main"]/a').discard("//a")
+        html, css = extractor.extract(TEST_HTML, input_css, base_url="http://test.com")
 
         expected_html = """<html><body><div id="main"><a href="http://test.com/test">Test <em>Link</em></a></div></body></html>"""
         expected_css = """a{background:url('http://test.com/picture.jpg');}"""
@@ -172,14 +170,12 @@ class ExtractorTestCase(TestCase):
         # More tests with different CSS formatting
 
         input_css = """a { background: url("picture.jpg");}"""
-        html, css = extractor.extract(
-            TEST_HTML, input_css, base_url='http://test.com')
+        html, css = extractor.extract(TEST_HTML, input_css, base_url="http://test.com")
 
         self.assertEqual(self.format_output(css), expected_css)
 
         input_css = """a { background: url(picture.jpg);}"""
-        html, css = extractor.extract(
-            TEST_HTML, input_css, base_url='http://test.com')
+        html, css = extractor.extract(TEST_HTML, input_css, base_url="http://test.com")
 
         self.assertEqual(self.format_output(css), expected_css)
 
@@ -212,9 +208,10 @@ class ExtractorTestCase(TestCase):
             background-image: url(data:image/png;base64,BASE64DATA)
         }
         """
-        extractor = Extractor().keep('//div[@id="main"]/a').discard('//a')
+        extractor = Extractor().keep('//div[@id="main"]/a').discard("//a")
         _, css = extractor.extract(
-            TEST_HTML, input_css, base_url='http://test.com/dir/')
+            TEST_HTML, input_css, base_url="http://test.com/dir/"
+        )
 
         expected_css = """@import url('http://test.com/dir/test.css') all;@import url('http://website.com/css/style.css') all;@media screen{p{color:blue;}}@font-face{font-family:'test';font-style:normal;font-weight:300;src:local('test');}@page{margin:1in;size:portrait;marks:none;}@page h1 :first{font-size:20pt;}@page :left{margin-left:4cm;}a{color:blue;background-image:url(data:image/png;base64,BASE64DATA);}"""
         self.assertEqual(self.format_output(css), expected_css)
@@ -229,7 +226,7 @@ class ExtractorTestCase(TestCase):
         article
         { color: blue; }"""
 
-        extractor = Extractor().keep('//body')
+        extractor = Extractor().keep("//body")
         _, css = extractor.extract(TEST_HTML, input_css)
 
         expected_css = """body,a{color:blue;}"""
@@ -247,7 +244,9 @@ class ExtractorTestCase(TestCase):
         extractor = Extractor().keep('//div[@id="main"]/a')
         html, css = extractor.extract(TEST_HTML, input_css)
 
-        expected_css = """a,div,body{color:red;font-size:10px;}a{border:1px solid red;}"""
+        expected_css = (
+            """a,div,body{color:red;font-size:10px;}a{border:1px solid red;}"""
+        )
         self.assertEqual(self.format_output(css), expected_css)
 
     def test_pseudo_css(self):
@@ -293,9 +292,10 @@ class ExtractorTestCase(TestCase):
         </html>
         """
 
-        extractor = Extractor().keep('//*')
+        extractor = Extractor().keep("//*")
         html = extractor.extract(
-            input_html, base_url='http://test.com/folder/hello.html')
+            input_html, base_url="http://test.com/folder/hello.html"
+        )
 
         expected_html = """<html><head></head><body><a onclick="open('http://test.com/folder/page.html')">Hello world :)</a></body></html>"""
         self.assertEqual(self.format_output(html), expected_html)
@@ -314,9 +314,10 @@ class ExtractorTestCase(TestCase):
         </html>
         """
 
-        extractor = Extractor().keep('//*')
+        extractor = Extractor().keep("//*")
         html = extractor.extract(
-            input_html, base_url='http://test.com/folder/hello.html')
+            input_html, base_url="http://test.com/folder/hello.html"
+        )
 
         expected_html = """<html><head></head><body><a onclick="document.location.href='http://test.com/folder/page.html'">Hello world :)</a></body></html>"""
         self.assertEqual(self.format_output(html), expected_html)
@@ -336,7 +337,7 @@ class ExtractorTestCase(TestCase):
         </html>
         """
 
-        extractor = Extractor().keep('//body').discard('//p')
+        extractor = Extractor().keep("//body").discard("//p")
         html = extractor.extract(input_html)
 
         expected_html = """<html><body>NOPE</body></html>"""
@@ -346,7 +347,7 @@ class ExtractorTestCase(TestCase):
         """
         Tests creation with classmethods
         """
-        extractor = Extractor.keep('//a').keep('//p').discard('//div')
+        extractor = Extractor.keep("//a").keep("//p").discard("//div")
 
         self.assertEqual(len(extractor._xpaths_to_keep), 2)
         self.assertEqual(len(extractor._xpaths_to_discard), 1)
@@ -360,7 +361,7 @@ class ExtractorTestCase(TestCase):
         body { color: red; }
         """
 
-        extractor = Extractor.keep('//body')
+        extractor = Extractor.keep("//body")
         _, css = extractor.extract(TEST_HTML, input_css)
 
         expected_css = """body{color:red;}"""
@@ -376,7 +377,7 @@ class ExtractorTestCase(TestCase):
         help << p { color: blue; }
         """
 
-        extractor = Extractor.keep('//body')
+        extractor = Extractor.keep("//body")
         _, css = extractor.extract(TEST_HTML, input_css)
 
         expected_css = """body < a{color:red;}help << p{color:blue;}"""
@@ -406,8 +407,9 @@ class ExtractorTestCase(TestCase):
           src: local('Font'), local('Font'), url("font.woff") format('woff');
         }"""
 
-        _, css = Extractor.keep('//*').extract(
-            TEST_HTML, input_css, base_url='http://website.com/dir/page.html')
+        _, css = Extractor.keep("//*").extract(
+            TEST_HTML, input_css, base_url="http://website.com/dir/page.html"
+        )
 
         expected_css = (
             """@font-face{font-family:'Roboto';font-style:normal;font-weight:700;src:local('Font'), local('Font'), url('http://website.com/dir/font.woff') format('woff');}"""
@@ -422,7 +424,8 @@ class ExtractorTestCase(TestCase):
         Tests CSS parsing when HTML didn't match
         """
         html, css = Extractor.keep('//div[@id="doesnotexists"]').extract(
-            TEST_HTML, TEST_CSS)
+            TEST_HTML, TEST_CSS
+        )
 
         self.assertIsNone(html)
         self.assertIsNone(css)
@@ -438,8 +441,9 @@ class ExtractorTestCase(TestCase):
             </body>
         </html>"""
 
-        html = Extractor.keep('//img').extract(
-            input_html, base_url='https://website.com/section/category/index.html')
+        html = Extractor.keep("//img").extract(
+            input_html, base_url="https://website.com/section/category/index.html"
+        )
 
         expected_html = """<html><body><img alt="Test" src="https://website.com/section/img/cool-picture.png"></body></html>"""
         self.assertEqual(self.format_output(html), expected_html)

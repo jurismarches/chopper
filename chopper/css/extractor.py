@@ -15,12 +15,13 @@ class CSSExtractor(TreeBuilderMixin):
     """
     Extracts CSS rules only matching a html tree
     """
+
     parser = CSSParser()
     xpath_translator = XpathTranslator()
 
     rel_to_abs_re = re.compile(
-        r'url\(["\']?(?!data:)(?P<path>[^\)]*)["\']?\)',
-        re.IGNORECASE | re.MULTILINE)
+        r'url\(["\']?(?!data:)(?P<path>[^\)]*)["\']?\)', re.IGNORECASE | re.MULTILINE
+    )
 
     def __init__(self, css_contents, html_contents):
         """
@@ -33,7 +34,7 @@ class CSSExtractor(TreeBuilderMixin):
         """
         self.css_contents = css_contents
         self.html_contents = html_contents
-        self.cleaned_css = ''
+        self.cleaned_css = ""
 
     ##########
     # Public #
@@ -65,9 +66,10 @@ class CSSExtractor(TreeBuilderMixin):
         :type css_contents: str
         """
         self.cleaned_css = self.rel_to_abs_re.sub(
-            lambda match: "url('%s')" % urljoin(
-                base_url, match.group('path').strip('\'"')),
-            self.cleaned_css)
+            lambda match: "url('%s')"
+            % urljoin(base_url, match.group("path").strip("'\"")),
+            self.cleaned_css,
+        )
 
     def to_string(self):
         """
@@ -94,7 +96,6 @@ class CSSExtractor(TreeBuilderMixin):
 
         # For every rule in the CSS
         for rule in self.stylesheet.rules:
-
             try:
                 # Clean the CSS rule
                 cleaned_rule = self._clean_rule(rule)
@@ -127,14 +128,15 @@ class CSSExtractor(TreeBuilderMixin):
         cleaned_token_list = []
 
         for token_list in split_on_comma(rule.selector):
-
             # If the token list matches the tree
             if self._token_list_matches_tree(token_list):
-
                 # Add a Comma if multiple token lists matched
                 if len(cleaned_token_list) > 0:
                     cleaned_token_list.append(
-                        cssselect.parser.Token('DELIM', ',', len(cleaned_token_list) + 1))
+                        cssselect.parser.Token(
+                            "DELIM", ",", len(cleaned_token_list) + 1
+                        )
+                    )
 
                 # Append it to the list of cleaned token list
                 cleaned_token_list += token_list
@@ -160,11 +162,14 @@ class CSSExtractor(TreeBuilderMixin):
         """
         try:
             parsed_selector = cssselect.parse(
-                ''.join(token.as_css() for token in token_list))[0]
+                "".join(token.as_css() for token in token_list)
+            )[0]
 
             return bool(
                 self.tree.xpath(
-                    self.xpath_translator.selector_to_xpath(parsed_selector)))
+                    self.xpath_translator.selector_to_xpath(parsed_selector)
+                )
+            )
         except Exception:
             # On error, assume the selector matches the tree
             return True
@@ -179,7 +184,7 @@ class CSSExtractor(TreeBuilderMixin):
         :rtype: string
         """
         # Build and return the cleaned CSS contents
-        return '\n'.join(self._rule_as_string(rule) for rule in rules)
+        return "\n".join(self._rule_as_string(rule) for rule in rules)
 
     def _rule_as_string(self, rule):
         """
@@ -192,14 +197,14 @@ class CSSExtractor(TreeBuilderMixin):
         """
         if isinstance(rule, RuleSet):
             # Simple CSS rule : a { color: red; }
-            return '%s{%s}' % (
+            return "%s{%s}" % (
                 self._selector_as_string(rule.selector),
-                self._declarations_as_string(rule.declarations))
+                self._declarations_as_string(rule.declarations),
+            )
 
         elif isinstance(rule, ImportRule):
             # @import rule
-            return "@import url('%s') %s;" % (
-                rule.uri, ','.join(rule.media))
+            return "@import url('%s') %s;" % (rule.uri, ",".join(rule.media))
 
         elif isinstance(rule, FontFaceRule):
             # @font-face rule
@@ -208,19 +213,21 @@ class CSSExtractor(TreeBuilderMixin):
         elif isinstance(rule, MediaRule):
             # @media rule
             return "@media %s{%s}" % (
-                ','.join(rule.media),
-                ''.join(self._rule_as_string(r) for r in rule.rules))
+                ",".join(rule.media),
+                "".join(self._rule_as_string(r) for r in rule.rules),
+            )
 
         elif isinstance(rule, PageRule):
             # @page rule
             selector, pseudo = rule.selector
 
             return "@page%s%s{%s}" % (
-                ' %s' % selector if selector else '',
-                ' :%s' % pseudo if pseudo else '',
-                self._declarations_as_string(rule.declarations))
+                " %s" % selector if selector else "",
+                " :%s" % pseudo if pseudo else "",
+                self._declarations_as_string(rule.declarations),
+            )
 
-        return ''
+        return ""
 
     def _selector_as_string(self, selector):
         """
@@ -231,9 +238,10 @@ class CSSExtractor(TreeBuilderMixin):
         :returns: The CSS string for the selector
         :rtype: str
         """
-        return ','.join(
-            ''.join(token.as_css() for token in strip_whitespace(token_list))
-            for token_list in split_on_comma(selector))
+        return ",".join(
+            "".join(token.as_css() for token in strip_whitespace(token_list))
+            for token_list in split_on_comma(selector)
+        )
 
     def _declarations_as_string(self, declarations):
         """
@@ -244,7 +252,8 @@ class CSSExtractor(TreeBuilderMixin):
         :returns: The CSS string for the declarations list
         :rtype: str
         """
-        return ''.join('%s:%s%s;' % (
-            d.name,
-            d.value.as_css(),
-            ' !' + d.priority if d.priority else '') for d in declarations)
+        return "".join(
+            "%s:%s%s;"
+            % (d.name, d.value.as_css(), " !" + d.priority if d.priority else "")
+            for d in declarations
+        )

@@ -1,4 +1,4 @@
 [run]
-omit = chopper/tests.py
+omit = chopper/test_extractor.py
 [report]
 show_missing = true

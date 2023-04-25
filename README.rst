@@ -5,7 +5,7 @@
 
 Chopper is a tool to extract elements from HTML by preserving ancestors and CSS rules.
 
-Compatible with Python >= 3.6
+Compatible with Python >= 3.8
 
 
 Installation

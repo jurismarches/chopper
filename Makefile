@@ -1,5 +1,5 @@
 tests:
-	nosetests --with-coverage --cover-package=chopper
+	pytest -s .
 
 styles:
 	isort chopper
@@ -8,5 +8,5 @@ styles:
 
 styles.check:
 	black . --check
-	isort --ws jurismarches --check-only
+	isort chopper --check-only
 	flake8 --config setup.cfg

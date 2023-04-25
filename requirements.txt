@@ -2,7 +2,7 @@
 .
 
 # Dev requirements
-Sphinx==1.2.2
+Sphinx>=6.2.0
 sphinx-rtd-theme
 pytest
 pytest-cov

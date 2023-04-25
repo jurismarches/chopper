@@ -1,7 +1,7 @@
 |axe| Chopper
 =============
 
-|pypi| ![github actions badge](https://github.com/jurismarches/chopper/actions/workflows/ci.yml/badge.svg)
+|pypi| |github-actions| |readthedocs|
 
 Chopper is a tool to extract elements from HTML by preserving ancestors and CSS rules.
 
@@ -82,7 +82,7 @@ The result is :
 .. |axe| image:: http://icons.iconarchive.com/icons/aha-soft/desktop-halloween/32/Hatchet-icon.png
 .. |pypi| image:: http://img.shields.io/pypi/v/chopper.svg?style=flat
     :target: https://pypi.python.org/pypi/chopper
-.. |travis| image:: http://img.shields.io/travis/jurismarches/chopper/master.svg?style=flat
-    :target: https://travis-ci.org/jurismarches/chopper
-.. |coveralls| image:: http://img.shields.io/coveralls/jurismarches/chopper/master.svg?style=flat
-    :target: https://coveralls.io/r/jurismarches/chopper
+.. |github-actions| image:: https://github.com/jurismarches/chopper/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/jurismarches/chopper/actions/
+.. |readthedocs| image:: https://readthedocs.org/projects/chopper/badge/?version=latest
+    :target: https://readthedocs.org/projects/chopper

@@ -85,4 +85,4 @@ The result is :
 .. |github-actions| image:: https://github.com/jurismarches/chopper/actions/workflows/ci.yml/badge.svg
     :target: https://github.com/jurismarches/chopper/actions/
 .. |readthedocs| image:: https://readthedocs.org/projects/chopper/badge/?version=latest
-    :target: https://readthedocs.org/projects/chopper
+    :target: http://chopper.readthedocs.org/en/latest/

@@ -3,7 +3,6 @@ from setuptools import setup
 
 from chopper import __version__
 
-
 with open("README.rst", "r") as f:
     long_description = f.read()
 

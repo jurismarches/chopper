@@ -79,9 +79,11 @@ class HTMLExtractor(TreeBuilderMixin):
 
         # Absolute links
         self.tree.rewrite_links(
-            lambda link: urljoin(base_url, link)
-            if not link.startswith(self.rel_to_abs_excluded_prefixes)
-            else link
+            lambda link: (
+                urljoin(base_url, link)
+                if not link.startswith(self.rel_to_abs_excluded_prefixes)
+                else link
+            )
         )
 
         # Extra attributes
